@@ -176,6 +176,17 @@ td input, td select{padding:6px 8px;font-size:13px;}
 .funnel-bar-fill span{color:#fff;font-size:11.5px;font-weight:700;}
 .funnel-conv{font-size:11.5px;color:var(--ink-muted);text-align:right;}
 
+.cadence-row{display:grid;grid-template-columns:150px repeat(4,1fr);align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F2F5;}
+.cadence-row:last-child{border-bottom:none;}
+.cadence-cell{background:#F7F9FC;border-radius:8px;padding:8px 10px;text-align:center;}
+.cadence-n{display:block;font-size:16px;font-weight:700;color:var(--navy);}
+.cadence-l{display:block;font-size:10px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.03em;margin-top:1px;}
+@media (max-width:860px){.cadence-row{grid-template-columns:1fr 1fr;row-gap:6px;}.cadence-row .stage-name{grid-column:1/-1;}}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#F0F2F5;color:var(--ink-muted);font-weight:700;font-size:12px;}
+.rank-badge.gold{background:#FCEFC7;color:#946200;}
+.rank-badge.silver{background:#E8EAED;color:#5A5F66;}
+.rank-badge.bronze{background:#F3DFC9;color:#8A5A2B;}
+
 .pill-nav{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
 .pill-nav .p{padding:6px 13px;border-radius:100px;font-size:12.5px;font-weight:600;background:#fff;border:1px solid var(--line);color:var(--ink-muted);cursor:pointer;}
 .pill-nav .p.active{background:var(--navy);color:#fff;border-color:var(--navy);}
@@ -212,7 +223,7 @@ a.linklike{color:var(--navy);text-decoration:underline;cursor:pointer;font-size:
 /* Guided sequence */
 .guide-bar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:20px;}
 .guide-bar-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:10px;}
-.guide-dots{display:flex;align-items:center;}
+.guide-dots{display:flex;align-items:center;overflow-x:auto;padding-bottom:2px;}
 .gstep{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;cursor:pointer;border:2px solid var(--line);color:var(--ink-muted);background:#fff;}
 .gstep.done{background:var(--green);border-color:var(--green);color:#fff;}
 .gstep.cur{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 0 0 4px #EAF0F8;}
@@ -268,6 +279,8 @@ a.linklike{color:var(--navy);text-decoration:underline;cursor:pointer;font-size:
   .navitem{min-height:46px;padding-top:10px;padding-bottom:10px;}
   .mobile-toggle{width:40px;height:40px;font-size:18px;}
   select, input[type=text], input[type=number], input[type=date]{min-height:40px;}
+  .gstep{width:22px;height:22px;font-size:10px;flex-shrink:0;}
+  .gline{min-width:8px;}
   .savebar{right:16px;left:16px;text-align:center;}
 }
 
@@ -319,16 +332,25 @@ const NAV = [
     {id:"ai-analysis", label:"AI Growth Analysis"},
     {id:"reverse-eng", label:"Reverse Engineering"},
   ]},
+  {group:"Performance", items:[
+    {id:"loan-officers", label:"Loan Officers"},
+    {id:"realtor-partners", label:"Realtor Partners"},
+    {id:"channels", label:"Acquisition Channels"},
+  ]},
   {group:"Executar", items:[
     {id:"scorecard", label:"Weekly Scorecard"},
     {id:"action-plan", label:"Growth Action Plan"},
     {id:"weekly-coach", label:"AI Weekly Coach"},
     {id:"meetings", label:"Meeting Assistant"},
+    {id:"risks", label:"Risk Register"},
   ]},
   {group:"Aprender", items:[
     {id:"experiments", label:"Experiments"},
     {id:"sop", label:"SOP Library"},
     {id:"knowledge", label:"Knowledge Base"},
+  ]},
+  {group:"Entregável", items:[
+    {id:"blueprint", label:"Blueprint 30/60/90"},
   ]},
 ];
 
@@ -393,6 +415,9 @@ const PT_TRANSLATIONS = {
   "Experiments": "Experimentos",
   "SOP Library": "Biblioteca de processos (SOPs)",
   "Knowledge Base": "Base de conhecimento",
+  "Acquisition Channels": "Canais de aquisição",
+  "Risk Register": "Registro de riscos",
+  "Blueprint 30/60/90": "Plano de negócio em 3 fases (30, 60 e 90 dias)",
   "SOP": "Procedimento Operacional Padrão",
   "Playbook": "Manual de estratégias/jogadas",
   "Script": "Roteiro de atendimento",
@@ -688,6 +713,8 @@ function defaultState(companyName){
     rates: {...DEFAULT_RATES},
     entries: [], scorecard: [], actionPlan: [], coachHistory: [], meetings: [],
     experiments: [], sops: [], kbNotes: [],
+    loanOfficersList: [], realtorPartnersList: [], channels: [], risks: [],
+    blueprint: null, blueprintDate: null,
     aiAnalysis: null, aiAnalysisDate: null,
     progress: {reverseEng:false, knowledge:false},
   };
@@ -715,7 +742,9 @@ const STORAGE_KEYS = {
   meta:"go-meta", rates:"go-rates", entries:"go-entries", scorecard:"go-scorecard",
   actionPlan:"go-action-plan", coachHistory:"go-coach-history", meetings:"go-meetings",
   experiments:"go-experiments", sops:"go-sops", kbNotes:"go-kb-notes",
-  aiAnalysis:"go-ai-analysis", progress:"go-progress"
+  aiAnalysis:"go-ai-analysis", progress:"go-progress",
+  loanOfficersList:"go-loan-officers", realtorPartnersList:"go-realtor-partners",
+  channels:"go-channels", risks:"go-risks", blueprint:"go-blueprint",
 };
 
 async function loadWorkspacesList(){
@@ -777,6 +806,8 @@ async function loadState(){
         const parsed = JSON.parse(res.value);
         if(k === "aiAnalysis"){
           state.aiAnalysis = parsed.text; state.aiAnalysisDate = parsed.date;
+        } else if(k === "blueprint"){
+          state.blueprint = parsed.text; state.blueprintDate = parsed.date;
         } else {
           state[k] = parsed;
         }
@@ -793,6 +824,7 @@ async function persist(key){
   try{
     let value = state[key];
     if(key === "aiAnalysis"){ value = {text: state.aiAnalysis, date: state.aiAnalysisDate}; }
+    if(key === "blueprint"){ value = {text: state.blueprint, date: state.blueprintDate}; }
     const result = await window.storage.set(storageKey, JSON.stringify(value), false);
     if(!result) throw new Error("Armazenamento retornou vazio");
     flashSaved(true);
@@ -866,6 +898,20 @@ function weeklyOf(monthlyTargets){
   const w = {};
   for(const k in monthlyTargets) w[k] = monthlyTargets[k] / 4.33;
   return w;
+}
+
+const WORKING_DAYS_PER_MONTH = 21.7; // ~5 business days/week average across a month
+
+function dailyOf(monthlyTargets){
+  const d = {};
+  for(const k in monthlyTargets) d[k] = monthlyTargets[k] / WORKING_DAYS_PER_MONTH;
+  return d;
+}
+
+function annualOf(monthlyTargets){
+  const a = {};
+  for(const k in monthlyTargets) a[k] = monthlyTargets[k] * 12;
+  return a;
 }
 
 // Health status green/yellow/red comparing actual to target ratio
@@ -1147,6 +1193,71 @@ function buildDataContext(){
     ctx += `- Meta semanal atual: ${forecast.weeklyTargetNow.toFixed(1)} loans\n`;
     ctx += `- ${forecast.weeksToTarget!==null ? `No ritmo de melhora atual, faltam aproximadamente ${forecast.weeksToTarget} semanas para atingir a meta semanal` : `No ritmo atual, a tendência NÃO está convergindo para a meta — a empresa está estagnada ou piorando`}\n`;
   }
+  if(state.loanOfficersList.length){
+    const sortedLO = state.loanOfficersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0));
+    ctx += `\nTOP LOAN OFFICERS (por loans fechados): ${sortedLO.slice(0,3).map(r=>`${r.name||'sem nome'} (${r.loansClosed??'—'} loans)`).join("; ")}\n`;
+  }
+  if(state.realtorPartnersList.length){
+    const sortedRP = state.realtorPartnersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0));
+    ctx += `TOP REALTOR PARTNERS (por loans fechados): ${sortedRP.slice(0,3).map(r=>`${r.name||'sem nome'} (${r.loansClosed??'—'} loans)`).join("; ")}\n`;
+  }
+  if(state.channels.length){
+    ctx += `CANAIS DE AQUISIÇÃO CADASTRADOS: ${state.channels.map(c=>c.name||'sem nome').join(", ")}\n`;
+  }
+  if(state.risks.length){
+    const sortedRisks = state.risks.slice().sort((a,b)=>{
+      const sa=(RISK_SCORE[a.probability]||0)*(RISK_SCORE[a.impact]||0), sb=(RISK_SCORE[b.probability]||0)*(RISK_SCORE[b.impact]||0);
+      return sb-sa;
+    });
+    ctx += `TOP RISCOS REGISTRADOS: ${sortedRisks.slice(0,3).map(r=>r.title||'sem título').join("; ")}\n`;
+  }
+  return ctx;
+}
+
+// Extends buildDataContext() with everything specific to the 30/60/90 blueprint: cadence
+// targets, individual performance rankings, channel ROI, risks, and the current action plan.
+function buildBlueprintContext(){
+  let ctx = buildDataContext();
+  const targets = reverseTargets(state.meta.targetLoans, state.rates);
+  const daily = dailyOf(targets), weekly = weeklyOf(targets), annual = annualOf(targets);
+
+  ctx += `\nMETAS EM TODOS OS RITMOS (diário, semanal, mensal, anual) PARA BATER ${state.meta.targetLoans} LOANS/MÊS:\n`;
+  STAGES.forEach(s=>{
+    ctx += `- ${s.label}: ${Math.round(daily[s.key])}/dia | ${Math.round(weekly[s.key])}/semana | ${Math.round(targets[s.key])}/mês | ${Math.round(annual[s.key])}/ano\n`;
+  });
+
+  if(state.loanOfficersList.length){
+    ctx += `\nRANKING DE LOAN OFFICERS:\n`;
+    state.loanOfficersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0)).forEach(r=>{
+      ctx += `- ${r.name||'sem nome'}: ${r.loansClosed??'—'} loans fechados, ${r.leadsAssigned??'—'} leads atribuídos${r.notes?`. Nota: ${r.notes}`:''}\n`;
+    });
+  }
+  if(state.realtorPartnersList.length){
+    ctx += `\nRANKING DE REALTOR PARTNERS:\n`;
+    state.realtorPartnersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0)).forEach(r=>{
+      ctx += `- ${r.name||'sem nome'}: ${r.loansClosed??'—'} loans fechados de ${r.referrals??'—'} indicações\n`;
+    });
+  }
+  if(state.channels.length){
+    ctx += `\nCANAIS DE AQUISIÇÃO:\n`;
+    state.channels.forEach(c=>{
+      const cac = (c.spend && c.loansClosed) ? (c.spend/c.loansClosed).toFixed(0) : "—";
+      ctx += `- ${c.name||'sem nome'}: ${c.leads??'—'} leads, gasto $${c.spend??'—'}, ${c.loansClosed??'—'} loans, CAC $${cac}\n`;
+    });
+  }
+  if(state.risks.length){
+    ctx += `\nRISCOS REGISTRADOS (ordenados por criticidade):\n`;
+    state.risks.slice().sort((a,b)=>{
+      const sa=(RISK_SCORE[a.probability]||0)*(RISK_SCORE[a.impact]||0), sb=(RISK_SCORE[b.probability]||0)*(RISK_SCORE[b.impact]||0);
+      return sb-sa;
+    }).forEach(r=>{
+      ctx += `- ${r.title||'sem título'} (probabilidade ${r.probability||'—'}, impacto ${r.impact||'—'}): mitigação: ${r.mitigation||'não definida'}\n`;
+    });
+  }
+  if(state.actionPlan.length){
+    ctx += `\nPLANO DE AÇÃO ATUAL:\n`;
+    state.actionPlan.forEach((p,i)=>{ ctx += `${i+1}. ${p.title} (impacto: ${p.impact||'—'}, responsável: ${p.responsible||'—'}, prazo: ${p.deadline||'—'})\n`; });
+  }
   return ctx;
 }
 
@@ -1410,6 +1521,21 @@ function bindEvents(){
       rerender();
     });
 
+    const resetBtn = document.getElementById('btn-reset-company');
+    if(resetBtn) resetBtn.addEventListener('click', ()=>{
+      const name = state.meta.companyName;
+      const confirmText = prompt(`Isso apaga TODOS os dados de "${name}" (todas as semanas, SOPs, riscos, ranking, tudo) — sem volta, a menos que você tenha um backup.\n\nSe tem certeza, digite o nome da empresa exatamente como está ("${name}") para confirmar:`);
+      if(confirmText === null) return;
+      if(confirmText.trim() !== name){
+        alert("Nome não confere. Nada foi apagado.");
+        return;
+      }
+      state = defaultState(name);
+      for(const key of Object.keys(STORAGE_KEYS)) persist(key);
+      formSourceId = null; importSummaryHtml = ""; backupSummaryHtml = `<div class="ai-block" style="margin-top:14px;"><h4>Dados resetados</h4><div class="txt">Todos os dados de "${esc(name)}" foram apagados. A empresa continua existindo, mas em branco.</div></div>`;
+      rerender();
+    });
+
     const importBackupBtn = document.getElementById('btn-import-backup');
     const backupFileInput = document.getElementById('backup-file-input');
     if(importBackupBtn && backupFileInput){
@@ -1636,6 +1762,106 @@ function bindEvents(){
     });
   }
 
+  /* ---------- LOAN OFFICERS ---------- */
+  if(activeTab === "loan-officers"){
+    const addBtn = document.getElementById('btn-add-lo');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      state.loanOfficersList.push({id:uid(), name:"", leadsAssigned:null, loansClosed:null, avgResponseTime:null, notes:""});
+      persist('loanOfficersList'); rerender();
+    });
+    main.querySelectorAll('tr[data-lo-id]').forEach(tr=>{
+      const id = tr.dataset.loId;
+      tr.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const row = state.loanOfficersList.find(r=>r.id===id);
+          if(!row) return;
+          row[inp.dataset.field] = (inp.type==='number') ? (inp.value===""?null:Number(inp.value)) : inp.value;
+          persist('loanOfficersList'); rerender();
+        });
+      });
+      const del = tr.querySelector('[data-del-lo]');
+      if(del) del.addEventListener('click', ()=>{
+        state.loanOfficersList = state.loanOfficersList.filter(r=>r.id!==id);
+        persist('loanOfficersList'); rerender();
+      });
+    });
+  }
+
+  /* ---------- REALTOR PARTNERS ---------- */
+  if(activeTab === "realtor-partners"){
+    const addBtn = document.getElementById('btn-add-rp');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      state.realtorPartnersList.push({id:uid(), name:"", referrals:null, loansClosed:null, notes:""});
+      persist('realtorPartnersList'); rerender();
+    });
+    main.querySelectorAll('tr[data-rp-id]').forEach(tr=>{
+      const id = tr.dataset.rpId;
+      tr.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const row = state.realtorPartnersList.find(r=>r.id===id);
+          if(!row) return;
+          row[inp.dataset.field] = (inp.type==='number') ? (inp.value===""?null:Number(inp.value)) : inp.value;
+          persist('realtorPartnersList'); rerender();
+        });
+      });
+      const del = tr.querySelector('[data-del-rp]');
+      if(del) del.addEventListener('click', ()=>{
+        state.realtorPartnersList = state.realtorPartnersList.filter(r=>r.id!==id);
+        persist('realtorPartnersList'); rerender();
+      });
+    });
+  }
+
+  /* ---------- ACQUISITION CHANNELS ---------- */
+  if(activeTab === "channels"){
+    const addBtn = document.getElementById('btn-add-ch');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      state.channels.push({id:uid(), name:"", leads:null, spend:null, loansClosed:null});
+      persist('channels'); rerender();
+    });
+    main.querySelectorAll('tr[data-ch-id]').forEach(tr=>{
+      const id = tr.dataset.chId;
+      tr.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const row = state.channels.find(r=>r.id===id);
+          if(!row) return;
+          row[inp.dataset.field] = (inp.type==='number') ? (inp.value===""?null:Number(inp.value)) : inp.value;
+          persist('channels'); rerender();
+        });
+      });
+      const del = tr.querySelector('[data-del-ch]');
+      if(del) del.addEventListener('click', ()=>{
+        state.channels = state.channels.filter(r=>r.id!==id);
+        persist('channels'); rerender();
+      });
+    });
+  }
+
+  /* ---------- RISK REGISTER ---------- */
+  if(activeTab === "risks"){
+    const addBtn = document.getElementById('btn-add-risk');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      state.risks.push({id:uid(), title:"", probability:"", impact:"", mitigation:"", responsible:"", status:"Monitorando"});
+      persist('risks'); rerender();
+    });
+    main.querySelectorAll('tr[data-risk-id]').forEach(tr=>{
+      const id = tr.dataset.riskId;
+      tr.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const row = state.risks.find(r=>r.id===id);
+          if(!row) return;
+          row[inp.dataset.field] = inp.value;
+          persist('risks'); rerender();
+        });
+      });
+      const del = tr.querySelector('[data-del-risk]');
+      if(del) del.addEventListener('click', ()=>{
+        state.risks = state.risks.filter(r=>r.id!==id);
+        persist('risks'); rerender();
+      });
+    });
+  }
+
   /* ---------- SOP LIBRARY ---------- */
   if(activeTab === "sop"){
     main.querySelectorAll('[data-sop-filter]').forEach(p=>{
@@ -1685,6 +1911,31 @@ function bindEvents(){
     if(concludeBtn) concludeBtn.addEventListener('click', ()=>{
       state.progress.knowledge = true;
       persist('progress'); rerender();
+    });
+  }
+
+  /* ---------- BLUEPRINT 30/60/90 ---------- */
+  if(activeTab === "blueprint"){
+    const genBtn = document.getElementById('btn-gen-blueprint');
+    if(genBtn) genBtn.addEventListener('click', async ()=>{
+      await withButtonLoading(genBtn, "Gerando blueprint...", async ()=>{
+        const ctx = buildBlueprintContext();
+        const system = "Você é um Chief Growth Officer e consultor estratégico sênior (estilo McKinsey/Bain/BCG) escrevendo um business plan formal para o dono de uma empresa de mortgage. Responda sempre em português do Brasil, em tom executivo e direto, sem markdown de código. Baseie-se estritamente nos dados fornecidos — se algo não tiver dado suficiente, diga isso claramente em vez de inventar.";
+        const user = ctx + `\n\nEscreva um Blueprint 30/60/90 completo, com exatamente estas seções (use estes títulos, sem numeração de markdown):\n\nDiagnóstico Atual\nOnde a Heart Mortgage está hoje: gargalo principal, correlações mais fortes, tendência histórica.\n\nMeta e Engenharia Reversa\nA meta de ${state.meta.targetLoans} loans/mês traduzida em metas diárias, semanais, mensais e anuais para cada etapa do funil.\n\nEstrutura e Pessoas\nO que o ranking de loan officers e parceiros mostra, e o que replicar do que já funciona.\n\nRiscos e Mitigação\nOs riscos mais críticos e como mitigá-los.\n\nFase 1 — Primeiros 30 dias\nAções específicas, prioritárias e de baixo custo para estabilizar a operação.\n\nFase 2 — Dias 31 a 60\nAções de consolidação e otimização com base no aprendizado da Fase 1.\n\nFase 3 — Dias 61 a 90\nAções de escala, uma vez que os processos da Fase 1 e 2 estejam validados.\n\nComo Vamos Medir o Progresso\nOs KPIs e a cadência de acompanhamento (diária, semanal, mensal) que vão mostrar se o plano está funcionando.`;
+        const text = await callClaude(system, user, 2200);
+        state.blueprint = text;
+        state.blueprintDate = new Date().toLocaleString('pt-BR');
+        await persist('blueprint');
+        rerender();
+      });
+    });
+
+    const downloadBtn = document.getElementById('btn-download-blueprint');
+    if(downloadBtn) downloadBtn.addEventListener('click', ()=>{
+      if(!state.blueprint) return;
+      const md = `# Blueprint 30/60/90 — ${state.meta.companyName}\n\nGerado em ${state.blueprintDate}\n\n${state.blueprint}`;
+      const safeName = state.meta.companyName.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+      downloadBlob(md, `blueprint-30-60-90-${safeName}.md`, "text/markdown;charset=utf-8;");
     });
   }
 }
@@ -1834,6 +2085,7 @@ RENDERERS["dashboard"] = function(){
         <button class="btn secondary small" id="btn-export-csv-history">Exportar histórico (CSV)</button>
         <button class="btn secondary small" id="btn-export-backup">Baixar backup completo (.json)</button>
         <button class="btn small" id="btn-import-backup">Restaurar backup</button>
+        <button class="btn ghost small" id="btn-reset-company" style="color:var(--red);">🗑 Resetar dados desta empresa</button>
         <input type="file" id="backup-file-input" accept=".json" style="display:none;">
       </div>
     </div>
@@ -2066,6 +2318,8 @@ function knowledgeFeed(){
   state.meetings.forEach(m=>{ if(m.decisions) items.push({source:"Meeting Assistant", tag:"Decisões", title:m.title, body:m.decisions, date:m.date}); });
   state.coachHistory.forEach(c=>items.push({source:"AI Weekly Coach", tag:"Resumo semanal", title:c.date, body:c.text, date:c.date}));
   if(state.aiAnalysis) items.push({source:"AI Growth Analysis", tag:"Análise", title:state.aiAnalysisDate, body:state.aiAnalysis, date:state.aiAnalysisDate});
+  state.risks.forEach(r=>{ if(r.mitigation) items.push({source:"Risk Register", tag:r.status||"Risco", title:r.title, body:r.mitigation, date:null}); });
+  if(state.blueprint) items.push({source:"Blueprint 30/60/90", tag:"Business Plan", title:state.blueprintDate, body:state.blueprint, date:state.blueprintDate});
   state.kbNotes.forEach(n=>items.push({source:"Nota manual", tag:n.tag||"Nota", title:n.title, body:n.content, date:null}));
   return items;
 }
@@ -2088,7 +2342,7 @@ function kbItemsHtml(){
 RENDERERS["knowledge"] = function(){
   return `
   <div class="page-head">
-    <div class="page-eyebrow">Módulo 10</div>
+    <div class="page-eyebrow">Módulo 14</div>
     <div class="page-title">${trm("Knowledge Base")}</div>
     <div class="page-sub">Toda decisão, aprendizado e processo registrado nos outros módulos alimenta automaticamente esta base — pesquisável em um só lugar.</div>
   </div>
@@ -2109,6 +2363,65 @@ RENDERERS["knowledge"] = function(){
   </div>
 
   <div id="kb-items">${kbItemsHtml()}</div>
+  `;
+};
+
+/* ============================= BLUEPRINT 30/60/90 ============================= */
+
+RENDERERS["blueprint"] = function(){
+  const targets = reverseTargets(state.meta.targetLoans, state.rates);
+  const daily = dailyOf(targets), weekly = weeklyOf(targets), annual = annualOf(targets);
+  const topLO = state.loanOfficersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0))[0];
+  const topPartner = state.realtorPartnersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0))[0];
+  const topRisks = state.risks.slice().sort((a,b)=>{
+    const sa=(RISK_SCORE[a.probability]||0)*(RISK_SCORE[a.impact]||0), sb=(RISK_SCORE[b.probability]||0)*(RISK_SCORE[b.impact]||0);
+    return sb-sa;
+  }).slice(0,3);
+  const bottleneck = latestEntry() ? findBottleneck(latestEntry(), state.rates) : null;
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 15 — Entregável final</div>
+    <div class="page-title">${trm("Blueprint 30/60/90")}</div>
+    <div class="page-sub">O business plan completo: onde a empresa está, como vai chegar em ${state.meta.targetLoans} loans/mês, e o plano de execução em 3 fases — pronto pra apresentar ao dono da empresa.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Nada novo aqui — este módulo compila tudo que você já preencheu nos outros 14."],
+    ["Como preencher","Preencha Dashboard, Loan Officers, Partners, Canais e Riscos primeiro — quanto mais completo, mais forte o blueprint."],
+    ["Por que preencher","É o documento que transforma 'a ferramenta calcula coisas' em 'aqui está seu plano de negócio'."],
+    ["Quais decisões tomar","Use isso como pauta da reunião com o dono da empresa — cada seção já é uma resposta a uma pergunta que ele vai fazer."],
+  ])}
+
+  <div class="card">
+    <div class="section-title">Resumo executivo instantâneo (sem IA)</div>
+    <div class="section-help">Montado automaticamente a partir dos seus dados — sempre disponível, mesmo sem gerar a versão com IA.</div>
+    <div class="hr"></div>
+    <div class="grid g2">
+      <div class="kpi-card"><div class="label">Meta mensal</div><div class="value">${state.meta.targetLoans} loans</div><div class="foot">${Math.round(daily.loans)}/dia · ${Math.round(weekly.loans)}/semana · ${Math.round(annual.loans)}/ano</div></div>
+      <div class="kpi-card"><div class="label">Maior gargalo</div><div class="value" style="font-size:15px;">${bottleneck?trm(bottleneck.stage.label):'—'}</div><div class="foot">${bottleneck?`gap de ${bottleneck.gap.toFixed(1)}pp vs. meta`:'preencha o Dashboard'}</div></div>
+      <div class="kpi-card"><div class="label">Top Loan Officer</div><div class="value" style="font-size:15px;">${topLO?esc(topLO.name||'—'):'—'}</div><div class="foot">${topLO?`${topLO.loansClosed} loans fechados`:'nenhum cadastrado'}</div></div>
+      <div class="kpi-card"><div class="label">Top Realtor Partner</div><div class="value" style="font-size:15px;">${topPartner?esc(topPartner.name||'—'):'—'}</div><div class="foot">${topPartner?`${topPartner.loansClosed} loans fechados`:'nenhum cadastrado'}</div></div>
+    </div>
+    ${topRisks.length ? `<div class="hr"></div><div class="section-title" style="font-size:12px;">Top 3 riscos</div>${topRisks.map(r=>`<div class="small" style="margin-top:6px;">⚠ <b>${esc(r.title||'sem título')}</b> (${r.probability||'—'}/${r.impact||'—'})</div>`).join("")}` : ''}
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Blueprint completo (com IA)</div>
+        <div class="section-help">Gera o documento estruturado em fases 30/60/90, no formato de business plan, pronto pra apresentar.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn secondary" id="btn-download-blueprint" ${!state.blueprint?'disabled':''}>Baixar (.md)</button>
+        <button class="btn" id="btn-gen-blueprint">Gerar Blueprint 30/60/90</button>
+      </div>
+    </div>
+    <div class="hr"></div>
+    <div id="blueprint-output">
+      ${state.blueprint ? `<div class="ai-block"><h4>Gerado em ${esc(state.blueprintDate)}</h4><div class="txt">${esc(state.blueprint)}</div></div>` : `<div class="empty">Nenhum blueprint gerado ainda. Clique em <b>Gerar Blueprint 30/60/90</b>.</div>`}
+    </div>
+  </div>
   `;
 };
 
@@ -2136,7 +2449,7 @@ RENDERERS["sop"] = function(){
 
   return `
   <div class="page-head">
-    <div class="page-eyebrow">Módulo 9</div>
+    <div class="page-eyebrow">Módulo 13</div>
     <div class="page-title">${trm("SOP Library")}</div>
     <div class="page-sub">Onde vivem os processos documentados: SOPs, playbooks, scripts e treinamentos — a memória operacional da empresa.</div>
   </div>
@@ -2178,7 +2491,7 @@ RENDERERS["experiments"] = function(){
 
   return `
   <div class="page-head">
-    <div class="page-eyebrow">Módulo 8</div>
+    <div class="page-eyebrow">Módulo 12</div>
     <div class="page-title">${trm("Experiments")}</div>
     <div class="page-sub">O backlog de testes: toda hipótese registrada, medida e decidida — nada fica só no "achismo".</div>
   </div>
@@ -2197,6 +2510,154 @@ RENDERERS["experiments"] = function(){
     </div>
     <div class="hr"></div>
     ${rows.length ? `<div style="overflow-x:auto;"><table style="min-width:720px;"><thead><tr><th>Hipótese</th><th>Objetivo</th><th>Result. esperado</th><th>Result. real</th><th>Aprendizado</th><th>Decisão</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : `<div class="empty">Nenhum experimento ainda.</div>`}
+  </div>
+  `;
+};
+
+/* ============================= LOAN OFFICERS (PERFORMANCE) ============================= */
+
+RENDERERS["loan-officers"] = function(){
+  const rows = state.loanOfficersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0));
+  const top = rows[0];
+
+  const rowsHtml = rows.map((r,idx)=>{
+    const conv = (r.leadsAssigned && r.loansClosed!==null && r.loansClosed!==undefined) ? (r.loansClosed/r.leadsAssigned*100) : null;
+    return `
+    <tr data-lo-id="${r.id}">
+      <td><span class="rank-badge ${idx===0?'gold':idx===1?'silver':idx===2?'bronze':''}">${idx+1}</span></td>
+      <td><input type="text" data-field="name" value="${esc(r.name)}" placeholder="Nome"></td>
+      <td><input type="number" min="0" data-field="leadsAssigned" value="${r.leadsAssigned??''}" style="width:90px;"></td>
+      <td><input type="number" min="0" data-field="loansClosed" value="${r.loansClosed??''}" style="width:90px;"></td>
+      <td>${conv!==null ? `<span class="badge ${conv>=15?'green':conv>=8?'yellow':'red'}"><span class="d"></span>${conv.toFixed(1)}%</span>` : '<span class="muted small">—</span>'}</td>
+      <td><input type="number" min="0" data-field="avgResponseTime" value="${r.avgResponseTime??''}" style="width:80px;" placeholder="min"></td>
+      <td><input type="text" data-field="notes" value="${esc(r.notes)}" placeholder="O que ele faz diferente?"></td>
+      <td><button class="btn ghost small" data-del-lo="${r.id}">Remover</button></td>
+    </tr>`;
+  }).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 4</div>
+    <div class="page-title">${trm("Loan Officers")}</div>
+    <div class="page-sub">Quem performa melhor e o que faz diferente — pra replicar o que funciona, em vez de só torcer que todo mundo melhore igual.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Nome de cada loan officer, leads atribuídos e loans fechados no período, tempo médio de resposta."],
+    ["Como preencher","Uma linha por pessoa. Atualize mensalmente (ou semanalmente, se preferir mais granularidade)."],
+    ["Por que preencher","'Loan Officers' como número agregado esconde quem realmente performa — isso individualiza."],
+    ["Quais decisões tomar","Estude o que o top performer faz diferente (nas notas) e tente replicar com o resto do time."],
+  ])}
+
+  ${top && top.loansClosed ? `<div class="ai-block"><h4>Top performer atual</h4><div class="txt"><b>${esc(top.name||'Sem nome')}</b> — ${top.loansClosed} loans fechados${top.notes?`. Nota: ${esc(top.notes)}`:''}</div></div>` : ''}
+
+  <div class="card">
+    <div class="flex-between">
+      <div><div class="section-title">Ranking de performance</div><div class="section-help">Ordenado automaticamente por loans fechados.</div></div>
+      <button class="btn" id="btn-add-lo">+ Adicionar loan officer</button>
+    </div>
+    <div class="hr"></div>
+    ${rows.length ? `<div style="overflow-x:auto;"><table style="min-width:760px;"><thead><tr><th>#</th><th>Nome</th><th>Leads Atrib.</th><th>Loans Fech.</th><th>Conversão</th><th>Tempo Resp.</th><th>O que faz diferente</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : `<div class="empty">Nenhum loan officer cadastrado ainda.</div>`}
+  </div>
+  `;
+};
+
+/* ============================= REALTOR PARTNERS (PERFORMANCE) ============================= */
+
+RENDERERS["realtor-partners"] = function(){
+  const rows = state.realtorPartnersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0));
+  const top = rows[0];
+
+  const rowsHtml = rows.map((r,idx)=>{
+    const conv = (r.referrals && r.loansClosed!==null && r.loansClosed!==undefined) ? (r.loansClosed/r.referrals*100) : null;
+    return `
+    <tr data-rp-id="${r.id}">
+      <td><span class="rank-badge ${idx===0?'gold':idx===1?'silver':idx===2?'bronze':''}">${idx+1}</span></td>
+      <td><input type="text" data-field="name" value="${esc(r.name)}" placeholder="Nome / imobiliária"></td>
+      <td><input type="number" min="0" data-field="referrals" value="${r.referrals??''}" style="width:90px;"></td>
+      <td><input type="number" min="0" data-field="loansClosed" value="${r.loansClosed??''}" style="width:90px;"></td>
+      <td>${conv!==null ? `<span class="badge ${conv>=40?'green':conv>=20?'yellow':'red'}"><span class="d"></span>${conv.toFixed(1)}%</span>` : '<span class="muted small">—</span>'}</td>
+      <td><input type="text" data-field="notes" value="${esc(r.notes)}" placeholder="Notas de relacionamento"></td>
+      <td><button class="btn ghost small" data-del-rp="${r.id}">Remover</button></td>
+    </tr>`;
+  }).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 5</div>
+    <div class="page-title">${trm("Realtor Partners")}</div>
+    <div class="page-sub">Qual parceiro corretor realmente traz negócio fechado — pra priorizar relacionamento onde vale a pena.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Nome do parceiro/imobiliária, indicações enviadas, e quantas viraram loan fechado."],
+    ["Como preencher","Uma linha por parceiro. Atualize mensalmente."],
+    ["Por que preencher","Nem todo parceiro que manda indicação fecha negócio — isso separa quem traz volume de quem traz qualidade."],
+    ["Quais decisões tomar","Invista tempo de relacionamento nos parceiros com melhor conversão, não só nos que mandam mais volume."],
+  ])}
+
+  ${top && top.loansClosed ? `<div class="ai-block"><h4>Melhor parceiro atual</h4><div class="txt"><b>${esc(top.name||'Sem nome')}</b> — ${top.loansClosed} loans fechados a partir das indicações dele.</div></div>` : ''}
+
+  <div class="card">
+    <div class="flex-between">
+      <div><div class="section-title">Ranking de parceiros</div><div class="section-help">Ordenado automaticamente por loans fechados.</div></div>
+      <button class="btn" id="btn-add-rp">+ Adicionar parceiro</button>
+    </div>
+    <div class="hr"></div>
+    ${rows.length ? `<div style="overflow-x:auto;"><table style="min-width:680px;"><thead><tr><th>#</th><th>Nome</th><th>Indicações</th><th>Loans Fech.</th><th>Conversão</th><th>Notas</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : `<div class="empty">Nenhum parceiro cadastrado ainda.</div>`}
+  </div>
+  `;
+};
+
+/* ============================= ACQUISITION CHANNELS (ROI) ============================= */
+
+RENDERERS["channels"] = function(){
+  const rows = state.channels;
+  // Estimate average revenue per loan from historical entries, to compute ROI per channel.
+  const validRevEntries = state.entries.filter(e=>e.revenue!==null&&e.revenue!==undefined&&e.loans);
+  const avgRevPerLoan = validRevEntries.length
+    ? validRevEntries.reduce((a,e)=>a+e.revenue,0) / validRevEntries.reduce((a,e)=>a+e.loans,0)
+    : null;
+
+  const rowsHtml = rows.map(r=>{
+    const cac = (r.spend && r.loansClosed) ? Math.round(r.spend/r.loansClosed) : null;
+    const estRevenue = (avgRevPerLoan && r.loansClosed) ? avgRevPerLoan*r.loansClosed : null;
+    const roi = (estRevenue!==null && r.spend) ? ((estRevenue - r.spend)/r.spend*100) : null;
+    return `
+    <tr data-ch-id="${r.id}">
+      <td><input type="text" data-field="name" value="${esc(r.name)}" placeholder="Ex: Google Ads, Indicação, Orgânico"></td>
+      <td><input type="number" min="0" data-field="leads" value="${r.leads??''}" style="width:90px;"></td>
+      <td><input type="number" min="0" data-field="spend" value="${r.spend??''}" style="width:100px;"></td>
+      <td><input type="number" min="0" data-field="loansClosed" value="${r.loansClosed??''}" style="width:90px;"></td>
+      <td>${cac!==null ? fmtMoney(cac) : '<span class="muted small">—</span>'}</td>
+      <td>${roi!==null ? `<span class="badge ${roi>=100?'green':roi>=0?'yellow':'red'}"><span class="d"></span>${roi>=0?'+':''}${roi.toFixed(0)}%</span>` : '<span class="muted small">—</span>'}</td>
+      <td><button class="btn ghost small" data-del-ch="${r.id}">Remover</button></td>
+    </tr>`;
+  }).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 6</div>
+    <div class="page-title">${trm("Acquisition Channels")}</div>
+    <div class="page-sub">Retorno sobre cada canal de aquisição — pra investir mais no que compensa, e cortar o que só queima orçamento.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Cada canal (Google Ads, Facebook, Indicação, Orgânico, etc.), leads gerados, gasto e loans fechados."],
+    ["Como preencher","Uma linha por canal, atualizada mensalmente com os números daquele canal específico."],
+    ["Por que preencher","'Marketing Spend' como número único esconde qual canal realmente converte em loan fechado."],
+    ["Quais decisões tomar","O ROI usa a receita média por loan do seu histórico — invista mais onde o ROI é maior, corte onde é negativo."],
+  ])}
+
+  ${avgRevPerLoan ? `<div class="empty" style="text-align:left;padding:14px 18px;">Receita média por loan (calculada do seu histórico): <b>${fmtMoney(avgRevPerLoan)}</b> — usada para estimar o ROI de cada canal abaixo.</div>` : `<div class="empty">Preencha algumas semanas no Dashboard (com Revenue e Loans) para o ROI ser calculado automaticamente.</div>`}
+
+  <div class="card">
+    <div class="flex-between">
+      <div><div class="section-title">Canais de aquisição</div></div>
+      <button class="btn" id="btn-add-ch">+ Adicionar canal</button>
+    </div>
+    <div class="hr"></div>
+    ${rows.length ? `<div style="overflow-x:auto;"><table style="min-width:680px;"><thead><tr><th>Canal</th><th>Leads</th><th>Gasto</th><th>Loans Fech.</th><th>CAC</th><th>ROI est.</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : `<div class="empty">Nenhum canal cadastrado ainda.</div>`}
   </div>
   `;
 };
@@ -2228,7 +2689,7 @@ RENDERERS["meetings"] = function(){
 
   return `
   <div class="page-head">
-    <div class="page-eyebrow">Módulo 7</div>
+    <div class="page-eyebrow">Módulo 10</div>
     <div class="page-title">${trm("Meeting Assistant")}</div>
     <div class="page-sub">Cole as notas brutas da reunião e a IA extrai resumo, decisões, responsáveis, pendências e próximos passos.</div>
   </div>
@@ -2255,6 +2716,59 @@ RENDERERS["meetings"] = function(){
   `;
 };
 
+/* ============================= RISK REGISTER ============================= */
+
+const RISK_LEVELS = ["Baixa","Média","Alta"];
+const RISK_SCORE = {"Baixa":1,"Média":2,"Alta":3};
+
+RENDERERS["risks"] = function(){
+  const rows = state.risks.slice().sort((a,b)=>{
+    const scoreA = (RISK_SCORE[a.probability]||0) * (RISK_SCORE[a.impact]||0);
+    const scoreB = (RISK_SCORE[b.probability]||0) * (RISK_SCORE[b.impact]||0);
+    return scoreB - scoreA;
+  });
+
+  const rowsHtml = rows.map(r=>{
+    const score = (RISK_SCORE[r.probability]||0) * (RISK_SCORE[r.impact]||0);
+    const scoreBadge = score>=6 ? "red" : score>=3 ? "yellow" : "green";
+    return `
+    <tr data-risk-id="${r.id}">
+      <td><input type="text" data-field="title" value="${esc(r.title)}" placeholder="Ex: Dependência de 1 loan officer"></td>
+      <td><select data-field="probability">${RISK_LEVELS.map(l=>`<option ${r.probability===l?'selected':''}>${l}</option>`).join("")}<option value="" ${!r.probability?'selected':''}>—</option></select></td>
+      <td><select data-field="impact">${RISK_LEVELS.map(l=>`<option ${r.impact===l?'selected':''}>${l}</option>`).join("")}<option value="" ${!r.impact?'selected':''}>—</option></select></td>
+      <td>${score>0?`<span class="badge ${scoreBadge}"><span class="d"></span>${score}</span>`:'<span class="muted small">—</span>'}</td>
+      <td><textarea data-field="mitigation" rows="2" style="min-height:44px;" placeholder="Como mitigar?">${esc(r.mitigation)}</textarea></td>
+      <td><input type="text" data-field="responsible" value="${esc(r.responsible)}" style="width:110px;"></td>
+      <td><select data-field="status"><option ${r.status==='Monitorando'?'selected':''}>Monitorando</option><option ${r.status==='Em mitigação'?'selected':''}>Em mitigação</option><option ${r.status==='Resolvido'?'selected':''}>Resolvido</option><option ${r.status==='Materializado'?'selected':''}>Materializado</option></select></td>
+      <td><button class="btn ghost small" data-del-risk="${r.id}">Remover</button></td>
+    </tr>`;
+  }).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 11</div>
+    <div class="page-title">${trm("Risk Register")}</div>
+    <div class="page-sub">O que pode atrapalhar a meta de ${state.meta.targetLoans} loans/mês — mapeado antes de virar problema, não depois.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","O risco em si, probabilidade, impacto, plano de mitigação e responsável."],
+    ["Como preencher","Pense em: dependência de uma pessoa só, concentração num canal só, mudanças regulatórias, sazonalidade."],
+    ["Por que preencher","Risco não escrito é risco que ninguém está de olho até explodir."],
+    ["Quais decisões tomar","Riscos com score alto (probabilidade × impacto) viram prioridade imediata de mitigação."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div><div class="section-title">Registro de riscos</div><div class="section-help">Ordenado automaticamente do risco mais crítico para o menos crítico.</div></div>
+      <button class="btn" id="btn-add-risk">+ Adicionar risco</button>
+    </div>
+    <div class="hr"></div>
+    ${rows.length ? `<div style="overflow-x:auto;"><table style="min-width:820px;"><thead><tr><th>Risco</th><th>Probabilidade</th><th>Impacto</th><th>Score</th><th>Mitigação</th><th>Responsável</th><th>Status</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : `<div class="empty">Nenhum risco registrado ainda.</div>`}
+  </div>
+  `;
+};
+
 /* ============================= 6. AI WEEKLY COACH ============================= */
 
 RENDERERS["weekly-coach"] = function(){
@@ -2263,7 +2777,7 @@ RENDERERS["weekly-coach"] = function(){
 
   return `
   <div class="page-head">
-    <div class="page-eyebrow">Módulo 6</div>
+    <div class="page-eyebrow">Módulo 9</div>
     <div class="page-title">${trm("AI Weekly Coach")}</div>
     <div class="page-sub">Um resumo executivo automático toda semana: o que aconteceu, o que melhorou, o que piorou e o plano da próxima semana.</div>
   </div>
@@ -2328,7 +2842,7 @@ RENDERERS["action-plan"] = function(){
 
   return `
   <div class="page-head">
-    <div class="page-eyebrow">Módulo 5</div>
+    <div class="page-eyebrow">Módulo 8</div>
     <div class="page-title">${trm("Growth Action Plan")}</div>
     <div class="page-sub">As até 10 prioridades que mais movem o ponteiro, ordenadas por impacto — não por urgência.</div>
   </div>
@@ -2380,7 +2894,7 @@ RENDERERS["scorecard"] = function(){
 
   return `
   <div class="page-head">
-    <div class="page-eyebrow">Módulo 4</div>
+    <div class="page-eyebrow">Módulo 7</div>
     <div class="page-title">${trm("Weekly Scorecard")}</div>
     <div class="page-sub">O ritual semanal de prestação de contas: meta, resultado, gap, responsável e status — tudo em uma linha por KPI.</div>
   </div>
@@ -2428,14 +2942,17 @@ RENDERERS["reverse-eng"] = function(){
   const rates = state.rates;
   const targets = reverseTargets(state.meta.targetLoans, rates);
   const weekly = weeklyOf(targets);
+  const daily = dailyOf(targets);
+  const annual = annualOf(targets);
 
   const chain = STAGES.slice().reverse().map(s=>{
     const monthly = targets[s.key];
-    const wk = weekly[s.key];
-    return `<div class="funnel-row" style="grid-template-columns:170px 1fr 130px;">
-      <div class="stage-name">${trm(s.label)}</div>
-      <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--navy-soft),var(--navy));"><span>${Math.round(monthly)} / mês</span></div></div>
-      <div class="funnel-conv">${Math.round(wk)} / semana</div>
+    return `<div class="cadence-row">
+      <div class="stage-name" style="min-width:150px;">${trm(s.label)}</div>
+      <div class="cadence-cell"><span class="cadence-n">${fmtNum(Math.max(1,Math.round(daily[s.key])))}</span><span class="cadence-l">/ dia</span></div>
+      <div class="cadence-cell"><span class="cadence-n">${fmtNum(Math.round(weekly[s.key]))}</span><span class="cadence-l">/ semana</span></div>
+      <div class="cadence-cell"><span class="cadence-n">${fmtNum(Math.round(monthly))}</span><span class="cadence-l">/ mês</span></div>
+      <div class="cadence-cell"><span class="cadence-n">${fmtNum(Math.round(annual[s.key]))}</span><span class="cadence-l">/ ano</span></div>
     </div>`;
   }).join("");
 
@@ -2478,7 +2995,7 @@ RENDERERS["reverse-eng"] = function(){
 
   <div class="card">
     <div class="section-title">Para fechar ${state.meta.targetLoans} loans por mês, você precisa de:</div>
-    <div class="section-help">Cálculo automático, do fim do funil para o início.</div>
+    <div class="section-help">Cálculo automático, do fim do funil para o início — em ritmo diário, semanal, mensal e anual.</div>
     <div class="hr"></div>
     ${chain}
   </div>
@@ -2640,6 +3157,11 @@ function isComplete(id){
     case "experiments": return state.experiments.length >= 1;
     case "sop": return state.sops.length >= 1;
     case "knowledge": return !!(state.progress && state.progress.knowledge);
+    case "loan-officers": return state.loanOfficersList.length >= 1;
+    case "realtor-partners": return state.realtorPartnersList.length >= 1;
+    case "channels": return state.channels.length >= 1;
+    case "risks": return state.risks.length >= 1;
+    case "blueprint": return !!state.blueprint;
     default: return false;
   }
 }
@@ -2655,6 +3177,11 @@ const PENDING_NOTES = {
   "experiments": "Adicione pelo menos um experimento com hipótese e objetivo definidos.",
   "sop": "Adicione pelo menos um SOP, playbook ou script à biblioteca.",
   "knowledge": "Explore a busca — quando estiver confortável com o conteúdo, clique em <b>Concluir tour</b> abaixo.",
+  "loan-officers": "Adicione pelo menos um loan officer com os números do mês para começar o ranking.",
+  "realtor-partners": "Adicione pelo menos um parceiro corretor com indicações enviadas e loans fechados.",
+  "channels": "Adicione pelo menos um canal de aquisição (ex: Google Ads, Indicação, Orgânico) com gasto e resultado.",
+  "risks": "Registre pelo menos um risco que possa atrapalhar a meta de 100 loans/mês.",
+  "blueprint": "Clique em <b>Gerar Blueprint 30/60/90</b> para montar o business plan completo pra apresentar ao dono da empresa.",
 };
 
 const COMPLETION_CRITERIA = {
@@ -2668,6 +3195,11 @@ const COMPLETION_CRITERIA = {
   "experiments": "Conclui quando: você adiciona o primeiro teste",
   "sop": "Conclui quando: você adiciona o primeiro processo",
   "knowledge": "Conclui quando: você clica em \"Concluir tour\"",
+  "loan-officers": "Conclui quando: você adiciona o primeiro loan officer",
+  "realtor-partners": "Conclui quando: você adiciona o primeiro parceiro",
+  "channels": "Conclui quando: você adiciona o primeiro canal de aquisição",
+  "risks": "Conclui quando: você registra o primeiro risco",
+  "blueprint": "Conclui quando: você gera o blueprint 30/60/90",
 };
 
 const COMPLETION_NOTES = {
@@ -2680,7 +3212,12 @@ const COMPLETION_NOTES = {
   "meetings": "Suas decisões estão documentadas — agora registre o que está sendo testado.",
   "experiments": "Todo aprendizado validado aqui deveria virar processo na biblioteca.",
   "sop": "Seus processos estão documentados e já aparecem na Knowledge Base.",
-  "knowledge": "Você concluiu as 10 etapas. A partir de agora, o ciclo é semanal.",
+  "knowledge": "Sua base de conhecimento está pesquisável — continue para as próximas etapas.",
+  "loan-officers": "Você já sabe quem performa melhor e por quê — use isso para replicar o que funciona.",
+  "realtor-partners": "Seus melhores parceiros estão identificados — priorize o relacionamento com eles.",
+  "channels": "Você sabe o ROI de cada canal — invista mais no que compensa, corte o que não compensa.",
+  "risks": "Riscos mapeados não pegam a empresa de surpresa — revise esta lista todo mês.",
+  "blueprint": "Seu business plan 30/60/90 está pronto para apresentar ao dono da empresa.",
 };
 
 function guidedBannerHtml(current){
