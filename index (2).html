@@ -1,0 +1,2725 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growth OS — Elevra Business Growth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B1E3B;
+  --navy-2:#132A4E;
+  --navy-soft:#3A5578;
+  --ink:#0F172A;
+  --ink-muted:#64748B;
+  --line:#E6E9EE;
+  --bg:#FAFBFC;
+  --card:#FFFFFF;
+  --green:#0F9D58;
+  --green-bg:#E9F7EF;
+  --yellow:#B7791F;
+  --yellow-bg:#FBF3E3;
+  --red:#C0392B;
+  --red-bg:#FCEBE9;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'IBM Plex Mono',monospace;}
+#app{display:flex;min-height:100vh;}
+
+/* Sidebar */
+#sidebar{
+  width:248px;
+  flex-shrink:0;
+  background:var(--navy);
+  color:#EAF0F8;
+  display:flex;
+  flex-direction:column;
+  position:fixed;
+  top:0;left:0;bottom:0;
+  overflow-y:auto;
+}
+#sidebar .brand{
+  padding:26px 22px 18px 22px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+#sidebar .brand .name{font-weight:700;font-size:15px;letter-spacing:0.2px;}
+#sidebar .brand .tag{font-size:11px;color:#9FB3CC;margin-top:3px;letter-spacing:0.4px;text-transform:uppercase;}
+.navgroup{padding:14px 10px;}
+.navlabel{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#7F93AD;padding:10px 12px 6px 12px;}
+.navitem{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;margin:1px 0;
+  border-radius:9px;
+  font-size:13.5px;
+  color:#CBD8EA;
+  cursor:pointer;
+  transition:background .12s ease, color .12s ease;
+  user-select:none;
+}
+.navitem:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.navitem.active{background:#EAF0F8;color:var(--navy);font-weight:600;}
+.navitem .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55;flex-shrink:0;}
+.navitem.active .dot{opacity:1;}
+.navnum{width:19px;height:19px;border-radius:50%;border:1.5px solid currentColor;opacity:.6;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.navitem.active .navnum{opacity:1;background:var(--navy);color:#EAF0F8;border-color:var(--navy);}
+.navitem .navnum.done{opacity:1;background:#7FE0A8;border-color:#7FE0A8;color:var(--navy);}
+
+/* Main */
+#main{margin-left:248px;flex:1;min-width:0;padding:32px 40px 80px 40px;max-width:1180px;}
+.page-head{margin-bottom:26px;}
+.page-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-muted);font-weight:600;}
+.page-title{font-size:26px;font-weight:700;margin:4px 0 6px 0;letter-spacing:-0.02em;}
+.page-sub{font-size:14px;color:var(--ink-muted);max-width:720px;line-height:1.5;}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;}
+.card + .card{margin-top:16px;}
+.grid{display:grid;gap:16px;}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:1fr 1fr 1fr;}
+.g4{grid-template-columns:repeat(4,1fr);}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr 1fr;}}
+
+.section-title{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--ink);margin:0 0 4px 0;}
+.section-help{font-size:12.5px;color:var(--ink-muted);margin:0 0 16px 0;line-height:1.5;}
+
+/* Explain box: what/how/why/decisions */
+.explain{
+  background:#F3F6FA;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px 18px;
+  margin-bottom:20px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+@media (max-width:900px){.explain{grid-template-columns:1fr 1fr;}}
+.explain .item .h{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--navy-soft);font-weight:700;margin-bottom:4px;}
+.explain .item .b{font-size:12.5px;color:var(--ink);line-height:1.45;}
+
+label.field-label{display:block;font-size:12px;color:var(--ink-muted);margin-bottom:5px;font-weight:500;}
+input[type=text], input[type=number], input[type=date], textarea, select{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:9px 11px;
+  font-size:13.5px;
+  font-family:inherit;
+  color:var(--ink);
+  background:#fff;
+  transition:border-color .12s ease;
+}
+input:focus, textarea:focus, select:focus{outline:none;border-color:var(--navy-soft);}
+textarea{resize:vertical;min-height:80px;}
+.field{margin-bottom:14px;}
+
+button.btn{
+  background:var(--navy);
+  color:#fff;
+  border:none;
+  border-radius:9px;
+  padding:9px 16px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .12s ease, transform .08s ease;
+}
+button.btn:hover{background:var(--navy-2);}
+button.btn:active{transform:scale(.98);}
+button.btn.secondary{background:#fff;color:var(--navy);border:1px solid var(--line);}
+button.btn.secondary:hover{background:#F3F6FA;}
+button.btn.ghost{background:transparent;color:var(--ink-muted);border:1px solid transparent;padding:6px 10px;}
+button.btn.ghost:hover{color:var(--red);}
+button.btn:disabled{opacity:.5;cursor:default;}
+button.btn.small{padding:6px 12px;font-size:12px;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);padding:8px 10px;border-bottom:1px solid var(--line);font-weight:600;}
+td{padding:9px 10px;border-bottom:1px solid #F0F2F5;vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+td input, td select{padding:6px 8px;font-size:13px;}
+
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;}
+.badge.green{background:var(--green-bg);color:var(--green);}
+.badge.yellow{background:var(--yellow-bg);color:var(--yellow);}
+.badge.red{background:var(--red-bg);color:var(--red);}
+.badge .d{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+.kpi-card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff;}
+.kpi-card.missing{border-color:#F3C6C2;background:#FFFBFA;}
+.data-alert{border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:13px;line-height:1.55;}
+.data-alert.warn{background:var(--red-bg);border:1px solid #F3C6C2;color:var(--ink);}
+.data-alert.warn b{color:var(--red);}
+.kpi-card .label{font-size:11px;color:var(--ink-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.kpi-card .value{font-size:22px;font-weight:700;margin-top:6px;letter-spacing:-0.01em;}
+.kpi-card .foot{font-size:11.5px;margin-top:6px;color:var(--ink-muted);}
+
+.ring-wrap{display:flex;align-items:center;gap:26px;}
+.ring{width:150px;height:150px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;}
+.ring .inner{width:112px;height:112px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring .inner .n{font-size:24px;font-weight:800;color:var(--navy);}
+.ring .inner .l{font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;}
+
+.funnel-row{display:grid;grid-template-columns:150px 1fr 90px;align-items:center;gap:14px;margin-bottom:10px;}
+.funnel-row .stage-name{font-size:12.5px;font-weight:600;color:var(--ink);}
+.funnel-bar-track{background:#F0F2F5;border-radius:7px;height:26px;overflow:hidden;}
+.funnel-bar-fill{background:linear-gradient(90deg,var(--navy),var(--navy-soft));height:100%;border-radius:7px;display:flex;align-items:center;padding-left:10px;}
+.funnel-bar-fill span{color:#fff;font-size:11.5px;font-weight:700;}
+.funnel-conv{font-size:11.5px;color:var(--ink-muted);text-align:right;}
+
+.pill-nav{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.pill-nav .p{padding:6px 13px;border-radius:100px;font-size:12.5px;font-weight:600;background:#fff;border:1px solid var(--line);color:var(--ink-muted);cursor:pointer;}
+.pill-nav .p.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+.empty{border:1px dashed var(--line);border-radius:12px;padding:30px;text-align:center;color:var(--ink-muted);font-size:13px;}
+.empty b{color:var(--ink);}
+
+.ai-block{border-left:3px solid var(--navy);background:#F7F9FC;border-radius:0 10px 10px 0;padding:16px 18px;margin-bottom:14px;}
+.ai-block h4{margin:0 0 8px 0;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--navy);}
+.ai-block .txt{font-size:13.5px;line-height:1.6;color:var(--ink);white-space:pre-wrap;}
+.loading-dots::after{content:'';animation:dots 1.2s steps(4,end) infinite;}
+@keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%{content:'...'}80%,100%{content:''}}
+
+.priority-card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;display:grid;grid-template-columns:44px 1fr 130px;gap:16px;align-items:start;}
+.priority-card .num{width:36px;height:36px;border-radius:9px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+.priority-card .meta{font-size:11.5px;color:var(--ink-muted);margin-top:4px;line-height:1.5;}
+.priority-card .stat{text-align:right;}
+.priority-card .stat .impact{font-size:17px;font-weight:700;color:var(--green);}
+.priority-card .stat .impact.neutral{color:var(--navy);}
+
+.tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:100px;background:#F0F2F5;color:var(--ink-muted);font-weight:600;margin-right:6px;}
+.savebar{position:fixed;bottom:18px;right:38px;left:auto;max-width:calc(100% - 56px);background:var(--navy);color:#fff;font-size:12px;padding:8px 16px;border-radius:100px;opacity:0;transition:opacity .25s ease;pointer-events:none;box-shadow:0 6px 18px rgba(11,30,59,.25);}
+.savebar.show{opacity:1;}
+.savebar.error{background:var(--red);border-radius:12px;}
+
+.hr{height:1px;background:var(--line);margin:18px 0;border:none;}
+.flex-between{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.muted{color:var(--ink-muted);}
+.small{font-size:12px;}
+a.linklike{color:var(--navy);text-decoration:underline;cursor:pointer;font-size:12.5px;}
+.i18n-term{border-bottom:1px dotted var(--ink-muted);cursor:help;}
+.i18n-term:hover{border-bottom-color:var(--navy);}
+
+/* Guided sequence */
+.guide-bar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:20px;}
+.guide-bar-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:10px;}
+.guide-dots{display:flex;align-items:center;}
+.gstep{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;cursor:pointer;border:2px solid var(--line);color:var(--ink-muted);background:#fff;}
+.gstep.done{background:var(--green);border-color:var(--green);color:#fff;}
+.gstep.cur{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 0 0 4px #EAF0F8;}
+.gstep.todo:hover{border-color:var(--navy-soft);color:var(--navy-soft);}
+.gline{flex:1;height:2px;background:var(--line);margin:0 2px;}
+
+.next-callout{margin-top:20px;border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.next-callout.done{background:var(--green-bg);border:1px solid #CDEBD9;}
+.next-callout.done b{color:var(--green);}
+.next-callout.pending{background:#F3F6FA;border:1px solid var(--line);}
+.next-callout div{font-size:13px;line-height:1.5;color:var(--ink);}
+.workspace-switch{display:flex;gap:6px;padding:14px 22px 4px 22px;align-items:center;}
+.workspace-switch select{flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#EAF0F8;border-radius:8px;padding:6px 8px;font-size:12px;font-family:inherit;}
+.workspace-switch select option{color:#0F172A;}
+.workspace-switch button{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#EAF0F8;border-radius:8px;width:28px;height:28px;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0;}
+.workspace-switch button:hover{background:rgba(255,255,255,0.16);}
+.sidebar-key-btn{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);color:#EAF0F8;border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer;}
+.sidebar-key-btn:hover{background:rgba(255,255,255,0.14);}
+.sidebar-privacy-note{font-size:10.5px;color:#9FB3CC;line-height:1.5;margin-top:8px;}
+.sidebar-progress{padding:0 22px 16px 22px;}
+.sidebar-progress .bartrack{height:5px;border-radius:3px;background:rgba(255,255,255,0.12);overflow:hidden;margin-top:6px;}
+.sidebar-progress .barfill{height:100%;background:#7FE0A8;border-radius:3px;}
+.sidebar-progress .lbl{font-size:10.5px;color:#9FB3CC;}
+.navitem .check{margin-left:auto;color:#7FE0A8;font-size:12px;font-weight:700;}
+
+/* Mobile shell: sidebar becomes a collapsible top bar instead of a fixed 248px column */
+.mobile-toggle{display:none;}
+@media (max-width: 860px){
+  #sidebar{
+    position:fixed; top:0; left:0; right:0; bottom:auto;
+    width:100%; max-height:100vh; overflow-y:auto; z-index:60;
+  }
+  #sidebar .brand{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
+  #sidebar .brand .tag{display:none;}
+  #sidebar:not(.mobile-open) .workspace-switch,
+  #sidebar:not(.mobile-open) .sidebar-progress,
+  #sidebar:not(.mobile-open) .navgroup{display:none;}
+  .mobile-toggle{
+    display:flex;align-items:center;justify-content:center;
+    width:34px;height:34px;border-radius:8px;flex-shrink:0;
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);
+    color:#EAF0F8;font-size:16px;cursor:pointer;
+  }
+  #main{margin-left:0;margin-top:58px;padding:20px 16px 80px 16px;max-width:100%;}
+  .ring-wrap{flex-wrap:wrap;}
+  .funnel-row{grid-template-columns:1fr;gap:4px;}
+  .funnel-row .stage-name{font-size:12px;}
+  .priority-card{grid-template-columns:36px 1fr;}
+  .priority-card .stat{grid-column:1 / -1;text-align:left;margin-top:8px;}
+  .explain{grid-template-columns:1fr;}
+  button.btn{min-height:40px;}
+  button.btn.small{min-height:36px;}
+  .navitem{min-height:46px;padding-top:10px;padding-bottom:10px;}
+  .mobile-toggle{width:40px;height:40px;font-size:18px;}
+  select, input[type=text], input[type=number], input[type=date]{min-height:40px;}
+  .savebar{right:16px;left:16px;text-align:center;}
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="sidebar"></nav>
+  <main id="main"></main>
+</div>
+<div class="savebar" id="savebar">Salvo</div>
+<script>
+/* ============================= STANDALONE-MODE STORAGE POLYFILL ============================= */
+// Inside Claude's artifact environment, window.storage is provided natively (cross-device,
+// tied to the person's Claude account). Outside of it — e.g. hosted on GitHub Pages — that
+// API doesn't exist, so we polyfill the exact same interface backed by localStorage. Every
+// other line of code in this file is unaffected: it just calls window.storage as usual.
+const STANDALONE_MODE = !window.storage;
+if(STANDALONE_MODE){
+  window.storage = {
+    async get(key, shared){
+      const raw = localStorage.getItem("gos:" + key);
+      if(raw === null) throw new Error("not found");
+      return {key, value: raw, shared};
+    },
+    async set(key, value, shared){
+      try{ localStorage.setItem("gos:" + key, value); return {key, value, shared}; }
+      catch(e){ return null; }
+    },
+    async delete(key, shared){
+      localStorage.removeItem("gos:" + key);
+      return {key, deleted:true, shared};
+    },
+    async list(prefix, shared){
+      const keys = Object.keys(localStorage)
+        .filter(k=>k.startsWith("gos:"))
+        .map(k=>k.slice(4))
+        .filter(k=>!prefix||k.startsWith(prefix));
+      return {keys, prefix, shared};
+    },
+  };
+}
+
+/* ============================= CONSTANTS ============================= */
+
+const NAV = [
+  {group:"Operar", items:[
+    {id:"dashboard", label:"Executive Dashboard"},
+    {id:"ai-analysis", label:"AI Growth Analysis"},
+    {id:"reverse-eng", label:"Reverse Engineering"},
+  ]},
+  {group:"Executar", items:[
+    {id:"scorecard", label:"Weekly Scorecard"},
+    {id:"action-plan", label:"Growth Action Plan"},
+    {id:"weekly-coach", label:"AI Weekly Coach"},
+    {id:"meetings", label:"Meeting Assistant"},
+  ]},
+  {group:"Aprender", items:[
+    {id:"experiments", label:"Experiments"},
+    {id:"sop", label:"SOP Library"},
+    {id:"knowledge", label:"Knowledge Base"},
+  ]},
+];
+
+// Funnel stage definitions: key, label, and the rate-key that converts FROM previous stage TO this stage
+const STAGES = [
+  {key:"leads", label:"Leads"},
+  {key:"qualifiedLeads", label:"Qualified Leads", rateKey:"leadToQualified", rateLabel:"Lead → Qualified"},
+  {key:"appointments", label:"Appointments", rateKey:"qualifiedToAppt", rateLabel:"Qualified → Appointment"},
+  {key:"applications", label:"Applications", rateKey:"apptToApp", rateLabel:"Appointment → Application"},
+  {key:"preApprovals", label:"Pre Approvals", rateKey:"appToPreApproval", rateLabel:"Application → Pre-Approval"},
+  {key:"clearToClose", label:"Clear To Close", rateKey:"preApprovalToCTC", rateLabel:"Pre-Approval → CTC"},
+  {key:"loans", label:"Loans", rateKey:"ctcToLoan", rateLabel:"CTC → Loan"},
+];
+
+const DEFAULT_RATES = {
+  leadToQualified: 40,
+  qualifiedToAppt: 50,
+  apptToApp: 60,
+  appToPreApproval: 70,
+  preApprovalToCTC: 85,
+  ctcToLoan: 95,
+};
+
+const EXTRA_KPI_FIELDS = [
+  {key:"revenue", label:"Revenue", prefix:"$"},
+  {key:"marketingSpend", label:"Marketing Spend", prefix:"$"},
+  {key:"cac", label:"CAC", prefix:"$"},
+  {key:"responseTime", label:"Response Time (min)"},
+  {key:"loanOfficers", label:"Loan Officers"},
+  {key:"realtorPartners", label:"Realtor Partners"},
+];
+
+const MODEL = "claude-sonnet-4-6";
+
+/* ============================= PT-BR TRANSLATION TOOLTIPS ============================= */
+// Every English term in the UI (funnel stages, KPI fields, module names) gets a hoverable
+// "balãozinho" (dotted underline) showing its Portuguese meaning — text stays in English
+// (matching the original spec / mortgage industry vocabulary), translation is one hover away.
+
+const PT_TRANSLATIONS = {
+  "Leads": "Contatos captados (topo do funil)",
+  "Qualified Leads": "Contatos qualificados",
+  "Appointments": "Agendamentos / reuniões marcadas",
+  "Applications": "Solicitações de empréstimo",
+  "Pre Approvals": "Pré-aprovações de crédito",
+  "Clear To Close": "Liberado para fechamento (documentação aprovada)",
+  "Loans": "Empréstimos fechados",
+  "Revenue": "Receita",
+  "Marketing Spend": "Investimento em marketing",
+  "CAC": "Custo de Aquisição de Cliente",
+  "Response Time (min)": "Tempo de resposta (em minutos)",
+  "Response Time": "Tempo de resposta",
+  "Loan Officers": "Agentes/oficiais de crédito",
+  "Realtor Partners": "Parceiros corretores de imóveis",
+  "Executive Dashboard": "Painel executivo",
+  "AI Growth Analysis": "Análise de crescimento com IA",
+  "Reverse Engineering": "Engenharia reversa (cálculo de metas)",
+  "Weekly Scorecard": "Placar semanal",
+  "Growth Action Plan": "Plano de ação de crescimento",
+  "AI Weekly Coach": "Coach semanal com IA",
+  "Meeting Assistant": "Assistente de reuniões",
+  "Experiments": "Experimentos",
+  "SOP Library": "Biblioteca de processos (SOPs)",
+  "Knowledge Base": "Base de conhecimento",
+  "SOP": "Procedimento Operacional Padrão",
+  "Playbook": "Manual de estratégias/jogadas",
+  "Script": "Roteiro de atendimento",
+};
+
+const RATE_TERM_PT = {
+  "Lead": "Contato", "Qualified": "Qualificado", "Appointment": "Agendamento",
+  "Application": "Solicitação", "Pre-Approval": "Pré-aprovação", "CTC": "Liberado p/ fechamento", "Loan": "Empréstimo fechado",
+};
+
+// Wraps a single term in a dotted-underline span with a hover tooltip showing the PT-BR meaning.
+function trm(text){
+  const pt = PT_TRANSLATIONS[text];
+  if(!pt) return esc(text);
+  return `<span class="i18n-term" title="🇧🇷 ${esc(pt)}">${esc(text)}</span>`;
+}
+
+// Same idea for compound "A → B" rate labels (e.g. "Lead → Qualified"): translates each side.
+function trmRate(rateLabel){
+  return rateLabel.split(" → ").map(part=>{
+    const pt = RATE_TERM_PT[part.trim()];
+    return pt ? `<span class="i18n-term" title="🇧🇷 ${esc(pt)}">${esc(part)}</span>` : esc(part);
+  }).join(" → ");
+}
+
+
+/* ============================= CSV IMPORT ============================= */
+
+// Maps normalized (lowercase, no accents/spaces) header text -> internal field key
+const CSV_HEADER_MAP = {
+  "semana":"weekLabel", "week":"weekLabel", "weeklabel":"weekLabel", "label":"weekLabel", "rotulo":"weekLabel", "periodo":"weekLabel",
+  "leads":"leads",
+  "qualifiedleads":"qualifiedLeads", "leadsqualificados":"qualifiedLeads", "qualificados":"qualifiedLeads",
+  "appointments":"appointments", "agendamentos":"appointments", "reunioes":"appointments",
+  "applications":"applications", "aplicacoes":"applications", "aplicacao":"applications",
+  "preapprovals":"preApprovals", "preaprovacoes":"preApprovals", "preaprovacao":"preApprovals",
+  "cleartoclose":"clearToClose", "ctc":"clearToClose",
+  "loans":"loans", "emprestimos":"loans", "fechamentos":"loans",
+  "revenue":"revenue", "receita":"revenue",
+  "marketingspend":"marketingSpend", "gastodemarketing":"marketingSpend", "investimentomarketing":"marketingSpend",
+  "cac":"cac",
+  "responsetime":"responseTime", "tempoderesposta":"responseTime", "temporesposta":"responseTime",
+  "loanofficers":"loanOfficers",
+  "realtorpartners":"realtorPartners", "parceirosrealtors":"realtorPartners", "parceiros":"realtorPartners", "realtors":"realtorPartners",
+};
+
+// The expected order of the funnel — used to catch data that violates basic funnel logic
+// (a downstream stage can never have more volume than the stage that feeds it).
+const FUNNEL_ORDER = ["leads","qualifiedLeads","appointments","applications","preApprovals","clearToClose","loans"];
+
+function normalizeHeader(h){
+  return (h||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");
+}
+
+function detectDelimiter(headerLine){
+  const counts = {
+    ",": (headerLine.match(/,/g)||[]).length,
+    ";": (headerLine.match(/;/g)||[]).length,
+    "\t": (headerLine.match(/\t/g)||[]).length,
+  };
+  let best = ",", bestCount = counts[","];
+  [";","\t"].forEach(d=>{ if(counts[d] > bestCount){ best = d; bestCount = counts[d]; } });
+  return best;
+}
+
+function parseCSV(text){
+  // strip BOM
+  text = text.replace(/^\uFEFF/, "");
+  const lines = text.split(/\r\n|\r|\n/).filter(l=>l.trim().length>0);
+  if(!lines.length) return {rawHeaders: [], rows: []};
+  const delimiter = detectDelimiter(lines[0]);
+
+  function splitLine(line){
+    const out = [];
+    let cur = "";
+    let inQuotes = false;
+    for(let i=0;i<line.length;i++){
+      const c = line[i];
+      if(c === '"'){
+        if(inQuotes && line[i+1] === '"'){ cur += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if(c === delimiter && !inQuotes){
+        out.push(cur); cur = "";
+      } else {
+        cur += c;
+      }
+    }
+    out.push(cur);
+    return out.map(s=>s.trim());
+  }
+
+  const rawHeaders = splitLine(lines[0]);
+  const headers = rawHeaders.map(normalizeHeader);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cells = splitLine(lines[i]);
+    const row = {};
+    headers.forEach((h,idx)=>{ row[h] = cells[idx]; });
+    rows.push(row);
+  }
+  return {rawHeaders, headers, rows};
+}
+
+// Auto-detects whether a number uses Brazilian/European formatting (1.234,56) or
+// American formatting (1,234.56) — or plain thousands grouping with no decimals at all —
+// instead of assuming one locale and silently mangling the other.
+function parseNumberLoose(raw){
+  if(raw === undefined || raw === null) return {value:null, raw};
+  let s = raw.toString().trim();
+  if(s === "") return {value:null, raw};
+  // strip currency symbols, spaces, letters — keep only digits, comma, dot, minus
+  s = s.replace(/[^0-9,.\-]/g, "");
+  if(s === "" || s === "-"){
+    return {value:null, raw};
+  }
+
+  const hasComma = s.includes(",");
+  const hasDot = s.includes(".");
+
+  if(hasComma && hasDot){
+    const lastComma = s.lastIndexOf(",");
+    const lastDot = s.lastIndexOf(".");
+    if(lastComma > lastDot){
+      s = s.replace(/\./g, "").replace(",", "."); // BR/EU: dot=thousands, comma=decimal
+    } else {
+      s = s.replace(/,/g, ""); // US: comma=thousands, dot=decimal
+    }
+  } else if(hasComma){
+    const parts = s.split(",");
+    const lastPart = parts[parts.length-1];
+    s = (lastPart.length === 3) ? parts.join("") : parts.slice(0,-1).join("") + "." + lastPart;
+  } else if(hasDot){
+    const parts = s.split(".");
+    const lastPart = parts[parts.length-1];
+    if(parts.length > 1 && lastPart.length === 3) s = parts.join("");
+    // else: single decimal point, leave as-is
+  }
+
+  const n = parseFloat(s);
+  return {value: isNaN(n) ? null : n, raw};
+}
+
+function csvRowsToEntries(parsed){
+  const {rawHeaders, headers, rows} = parsed;
+  const entries = [];
+  const issues = {unrecognizedColumns: [], unparseableCells: [], funnelViolations: [], negativeValues: []};
+
+  // Report any column header we genuinely don't recognize, so the person can fix the spreadsheet
+  // instead of silently losing a whole column of data.
+  (rawHeaders||[]).forEach((raw, idx)=>{
+    const norm = headers[idx];
+    if(norm && !CSV_HEADER_MAP[norm] && !issues.unrecognizedColumns.includes(raw)){
+      issues.unrecognizedColumns.push(raw);
+    }
+  });
+
+  rows.forEach((row, i)=>{
+    const entry = {id: uid()};
+    let hasAnyData = false;
+    const rowLabel = row["semana"] || row["week"] || row["weeklabel"] || row["label"] || row["rotulo"] || row["periodo"] || `linha ${i+2}`;
+
+    Object.keys(row).forEach(h=>{
+      const fieldKey = CSV_HEADER_MAP[h];
+      if(!fieldKey) return;
+      if(fieldKey === "weekLabel"){ entry.weekLabel = row[h] || ""; return; }
+      const raw = row[h];
+      const {value} = parseNumberLoose(raw);
+      entry[fieldKey] = value;
+      if(value !== null){
+        hasAnyData = true;
+        if(value < 0){
+          issues.negativeValues.push(`${rowLabel}: ${fieldKey} = ${value}`);
+        }
+      } else if(raw !== undefined && raw !== null && raw.toString().trim() !== ""){
+        // there WAS text in the cell, but we couldn't turn it into a number
+        issues.unparseableCells.push(`${rowLabel}: campo "${fieldKey}" tinha "${raw}" (não reconhecido como número)`);
+      }
+    });
+
+    if(!entry.weekLabel) entry.weekLabel = "Semana importada " + (i+1);
+
+    // Funnel logic check: a downstream stage can't have more volume than the stage feeding it.
+    for(let k=1;k<FUNNEL_ORDER.length;k++){
+      const prevKey = FUNNEL_ORDER[k-1], curKey = FUNNEL_ORDER[k];
+      const prevVal = entry[prevKey], curVal = entry[curKey];
+      if(prevVal!==null && prevVal!==undefined && curVal!==null && curVal!==undefined && curVal > prevVal){
+        issues.funnelViolations.push(`${entry.weekLabel}: ${curKey} (${curVal}) maior que ${prevKey} (${prevVal})`);
+      }
+    }
+
+    if(hasAnyData) entries.push(entry);
+  });
+
+  return {entries, issues};
+}
+
+
+// Builds the post-import report: what came in clean, plus any columns, cells, or funnel
+// logic that look broken — so problems surface instead of silently becoming wrong numbers.
+function buildImportSummaryHtml(added, updated, issues){
+  const parts = [];
+  parts.push(`<div class="ai-block"><h4>Importação concluída</h4><div class="txt">${added} semana(s) nova(s) adicionada(s), ${updated} atualizada(s) — total de ${state.entries.length} semanas no histórico. O Dashboard, o funil, a tendência e os indicadores já foram recalculados.</div></div>`);
+
+  if(issues.unrecognizedColumns.length){
+    parts.push(`<div class="data-alert warn" style="margin-top:10px;"><div><b>⚠ Colunas não reconhecidas (ignoradas):</b> ${issues.unrecognizedColumns.map(esc).join(", ")}. Renomeie essas colunas para bater com o modelo se elas deveriam ter sido importadas.</div></div>`);
+  }
+  if(issues.unparseableCells.length){
+    const shown = issues.unparseableCells.slice(0,8);
+    parts.push(`<div class="data-alert warn" style="margin-top:10px;"><div><b>⚠ ${issues.unparseableCells.length} célula(s) com valor não reconhecido como número:</b><br>${shown.map(esc).join("<br>")}${issues.unparseableCells.length>shown.length?`<br>… e mais ${issues.unparseableCells.length-shown.length}.`:''}</div></div>`);
+  }
+  if(issues.negativeValues.length){
+    const shown = issues.negativeValues.slice(0,8);
+    parts.push(`<div class="data-alert warn" style="margin-top:10px;"><div><b>⚠ ${issues.negativeValues.length} valor(es) negativo(s) — provavelmente erro de digitação:</b><br>${shown.map(esc).join("<br>")}${issues.negativeValues.length>shown.length?`<br>… e mais ${issues.negativeValues.length-shown.length}.`:''}</div></div>`);
+  }
+  if(issues.funnelViolations.length){
+    const shown = issues.funnelViolations.slice(0,8);
+    parts.push(`<div class="data-alert warn" style="margin-top:10px;"><div><b>⚠ ${issues.funnelViolations.length} semana(s) com funil ilógico</b> (uma etapa mais avançada tem mais volume que a etapa anterior — geralmente é coluna trocada ou erro de digitação):<br>${shown.map(esc).join("<br>")}${issues.funnelViolations.length>shown.length?`<br>… e mais ${issues.funnelViolations.length-shown.length}.`:''}</div></div>`);
+  }
+  return parts.join("");
+}
+
+function downloadBlob(content, filename, mime){
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Full backup of the ACTIVE company's data — every module, not just the weekly entries —
+// so the person always has a copy outside the tool's own storage.
+function exportBackupJSON(){
+  const backup = {
+    _type: "growth-os-backup", _version: 1, _exportedAt: new Date().toISOString(),
+    companyName: state.meta.companyName,
+    state: state,
+  };
+  const safeName = state.meta.companyName.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+  const dateStr = new Date().toISOString().slice(0,10);
+  downloadBlob(JSON.stringify(backup, null, 2), `backup-${safeName}-${dateStr}.json`, "application/json");
+}
+
+// Restores a previously exported backup into the CURRENT active company (overwrites it).
+async function importBackupJSON(text){
+  let parsed;
+  try{ parsed = JSON.parse(text); }
+  catch(e){ throw new Error("Arquivo não é um JSON válido."); }
+  if(!parsed || parsed._type !== "growth-os-backup" || !parsed.state){
+    throw new Error("Este arquivo não parece ser um backup gerado por esta ferramenta.");
+  }
+  const proceed = confirm(`Restaurar o backup de "${parsed.companyName||'empresa desconhecida'}" (exportado em ${parsed._exportedAt?new Date(parsed._exportedAt).toLocaleString('pt-BR'):'data desconhecida'})?\n\nIsso SUBSTITUI todos os dados da empresa atual (${state.meta.companyName}). Essa ação não pode ser desfeita.`);
+  if(!proceed) return false;
+  state = {...defaultState(), ...parsed.state};
+  for(const key of Object.keys(STORAGE_KEYS)){
+    await persist(key);
+  }
+  const w = workspaces.find(x=>x.id===activeWorkspaceId);
+  if(w){ w.name = state.meta.companyName; await persistWorkspacesList(); }
+  return true;
+}
+
+// Exports just the weekly entries as CSV, in the same shape as the import template —
+// so data can round-trip out to Excel/Sheets, not just in.
+function exportEntriesCSV(){
+  const headers = ["Semana", ...ALL_ENTRY_FIELDS.map(f=>f.label)];
+  const lines = [headers.join(",")];
+  state.entries.forEach(e=>{
+    const row = [`"${(e.weekLabel||"").replace(/"/g,'""')}"`, ...ALL_ENTRY_FIELDS.map(f=> e[f.key]===null||e[f.key]===undefined ? "" : e[f.key])];
+    lines.push(row.join(","));
+  });
+  const safeName = state.meta.companyName.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+  downloadBlob(lines.join("\n"), `historico-${safeName}.csv`, "text/csv;charset=utf-8;");
+}
+
+function downloadCSVTemplate(){
+  const headers = ["Semana","Leads","Qualified Leads","Appointments","Applications","Pre Approvals","Clear To Close","Loans","Revenue","Marketing Spend","CAC","Response Time","Loan Officers","Realtor Partners"];
+  const example = ["Semana 1","500","200","100","60","40","25","20","100000","20000","1000","10","5","10"];
+  const csv = headers.join(",") + "\n" + example.join(",") + "\n";
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "modelo-growth-os.csv";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ============================= STATE ============================= */
+
+function defaultState(companyName){
+  return {
+    meta: {companyName: companyName || "Nova Empresa", targetLoans:100, period:"Mensal"},
+    rates: {...DEFAULT_RATES},
+    entries: [], scorecard: [], actionPlan: [], coachHistory: [], meetings: [],
+    experiments: [], sops: [], kbNotes: [],
+    aiAnalysis: null, aiAnalysisDate: null,
+    progress: {reverseEng:false, knowledge:false},
+  };
+}
+
+let state = defaultState("Elevra Business Growth");
+
+let activeTab = "dashboard";
+let scorecardFilter = "all";
+let sopFilter = "Todos";
+let importSummaryHtml = "";
+let backupSummaryHtml = "";
+let formSourceId = null; // when set, the "Preencher semana" form edits this historical entry instead of a blank new one
+
+// Multiple companies ("workspaces") can share this same tool, each with fully isolated data.
+// "default" always maps to the original, unprefixed storage keys so existing data never gets orphaned.
+let workspaces = [];
+let activeWorkspaceId = "default";
+
+function storageKeyFor(baseKey){
+  return activeWorkspaceId === "default" ? baseKey : (baseKey + "::" + activeWorkspaceId);
+}
+
+const STORAGE_KEYS = {
+  meta:"go-meta", rates:"go-rates", entries:"go-entries", scorecard:"go-scorecard",
+  actionPlan:"go-action-plan", coachHistory:"go-coach-history", meetings:"go-meetings",
+  experiments:"go-experiments", sops:"go-sops", kbNotes:"go-kb-notes",
+  aiAnalysis:"go-ai-analysis", progress:"go-progress"
+};
+
+async function loadWorkspacesList(){
+  try{
+    const res = await window.storage.get("go-active-workspace", false);
+    activeWorkspaceId = JSON.parse(res.value);
+  }catch(e){ activeWorkspaceId = "default"; }
+  try{
+    const res2 = await window.storage.get("go-workspaces", false);
+    workspaces = JSON.parse(res2.value);
+  }catch(e){ workspaces = []; }
+}
+
+async function persistWorkspacesList(){
+  try{ await window.storage.set("go-workspaces", JSON.stringify(workspaces), false); }catch(e){ console.error(e); }
+}
+async function persistActiveWorkspace(){
+  try{ await window.storage.set("go-active-workspace", JSON.stringify(activeWorkspaceId), false); }catch(e){ console.error(e); }
+}
+
+async function switchWorkspace(id){
+  if(id === activeWorkspaceId) return;
+  activeWorkspaceId = id;
+  await persistActiveWorkspace();
+  const wsEntry = workspaces.find(w=>w.id===id);
+  state = defaultState(wsEntry ? wsEntry.name : undefined);
+  await loadState();
+  formSourceId = null; importSummaryHtml = ""; backupSummaryHtml = ""; activeTab = "dashboard";
+  rerender();
+}
+
+async function createWorkspace(name){
+  const id = uid();
+  workspaces.push({id, name});
+  await persistWorkspacesList();
+  activeWorkspaceId = id;
+  await persistActiveWorkspace();
+  state = defaultState(name);
+  await persist('meta');
+  formSourceId = null; importSummaryHtml = ""; backupSummaryHtml = ""; activeTab = "dashboard";
+  rerender();
+}
+
+async function deleteWorkspace(id){
+  if(workspaces.length <= 1) return; // always keep at least one
+  workspaces = workspaces.filter(w=>w.id!==id);
+  await persistWorkspacesList();
+  if(activeWorkspaceId === id){
+    await switchWorkspace(workspaces[0].id);
+  }
+}
+
+async function loadState(){
+  for(const [k, baseKey] of Object.entries(STORAGE_KEYS)){
+    const storageKey = storageKeyFor(baseKey);
+    try{
+      const res = await window.storage.get(storageKey, false);
+      if(res && res.value !== undefined){
+        const parsed = JSON.parse(res.value);
+        if(k === "aiAnalysis"){
+          state.aiAnalysis = parsed.text; state.aiAnalysisDate = parsed.date;
+        } else {
+          state[k] = parsed;
+        }
+      }
+    }catch(e){ /* key not found yet, keep default */ }
+  }
+}
+
+let saveTimer = null;
+async function persist(key){
+  const baseKey = STORAGE_KEYS[key];
+  if(!baseKey) return true;
+  const storageKey = storageKeyFor(baseKey);
+  try{
+    let value = state[key];
+    if(key === "aiAnalysis"){ value = {text: state.aiAnalysis, date: state.aiAnalysisDate}; }
+    const result = await window.storage.set(storageKey, JSON.stringify(value), false);
+    if(!result) throw new Error("Armazenamento retornou vazio");
+    flashSaved(true);
+    return true;
+  }catch(e){
+    console.error("Storage error", e);
+    flashSaved(false);
+    return false;
+  }
+}
+function flashSaved(success){
+  const bar = document.getElementById("savebar");
+  if(!bar) return;
+  clearTimeout(saveTimer);
+  if(success === false){
+    bar.textContent = "⚠ Falha ao salvar — verifique sua conexão e tente novamente";
+    bar.classList.add("show", "error");
+    saveTimer = setTimeout(()=>{ bar.classList.remove("show","error"); bar.textContent = "Salvo"; }, 7000);
+  } else {
+    bar.textContent = "Salvo";
+    bar.classList.remove("error");
+    bar.classList.add("show");
+    saveTimer = setTimeout(()=>bar.classList.remove("show"), 1200);
+  }
+}
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function fmtNum(n){ if(n===undefined||n===null||isNaN(n)) return "—"; return Number(n).toLocaleString('en-US'); }
+function fmtMoney(n){ if(n===undefined||n===null||isNaN(n)) return "—"; return "$"+Number(n).toLocaleString('en-US'); }
+
+// Turns a "week starting on" date (YYYY-MM-DD, from a <input type=date>) into a friendly
+// "03/08 – 09/08/2026" label, so the person picks a week off a calendar instead of typing it.
+function formatWeekLabelFromDate(isoDateStr){
+  if(!isoDateStr) return "";
+  const start = new Date(isoDateStr + "T00:00:00");
+  if(isNaN(start.getTime())) return "";
+  const end = new Date(start); end.setDate(end.getDate()+6);
+  const pad2 = n => String(n).padStart(2,"0");
+  const fmt = d => pad2(d.getDate()) + "/" + pad2(d.getMonth()+1);
+  return `${fmt(start)} – ${fmt(end)}/${end.getFullYear()}`;
+}
+function pct(n){ if(n===undefined||n===null||isNaN(n)) return "—"; return Math.round(n)+"%"; }
+function esc(s){ return (s||"").toString().replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ============================= CALCULATIONS ============================= */
+
+function latestEntry(){
+  return state.entries.length ? state.entries[state.entries.length-1] : null;
+}
+function previousEntry(){
+  return state.entries.length > 1 ? state.entries[state.entries.length-2] : null;
+}
+
+// Reverse-engineer required volumes at each stage to hit target loans, using current rates
+function reverseTargets(targetLoans, rates){
+  const r = rates;
+  const ctc = targetLoans / (r.ctcToLoan/100);
+  const preApproval = ctc / (r.preApprovalToCTC/100);
+  const application = preApproval / (r.appToPreApproval/100);
+  const appointment = application / (r.apptToApp/100);
+  const qualified = appointment / (r.qualifiedToAppt/100);
+  const leads = qualified / (r.leadToQualified/100);
+  return {
+    loans: targetLoans, clearToClose: ctc, preApprovals: preApproval,
+    applications: application, appointments: appointment,
+    qualifiedLeads: qualified, leads: leads
+  };
+}
+
+function weeklyOf(monthlyTargets){
+  const w = {};
+  for(const k in monthlyTargets) w[k] = monthlyTargets[k] / 4.33;
+  return w;
+}
+
+// Health status green/yellow/red comparing actual to target ratio
+function health(actual, target){
+  if(target === undefined || target === null || target === 0 || actual === undefined || actual === null) return "yellow";
+  const ratio = actual/target;
+  if(ratio >= 0.9) return "green";
+  if(ratio >= 0.7) return "yellow";
+  return "red";
+}
+function healthLabel(h){ return h==="green"?"No ritmo":h==="yellow"?"Atenção":"Crítico"; }
+
+function actualConversionRates(entry){
+  if(!entry) return null;
+  const out = {};
+  out.leadToQualified = entry.leads ? (entry.qualifiedLeads/entry.leads*100) : null;
+  out.qualifiedToAppt = entry.qualifiedLeads ? (entry.appointments/entry.qualifiedLeads*100) : null;
+  out.apptToApp = entry.appointments ? (entry.applications/entry.appointments*100) : null;
+  out.appToPreApproval = entry.applications ? (entry.preApprovals/entry.applications*100) : null;
+  out.preApprovalToCTC = entry.preApprovals ? (entry.clearToClose/entry.preApprovals*100) : null;
+  out.ctcToLoan = entry.clearToClose ? (entry.loans/entry.clearToClose*100) : null;
+  return out;
+}
+
+// Find the weakest stage: biggest negative gap between actual conversion and configured/benchmark rate
+function findBottleneck(entry, rates){
+  const actual = actualConversionRates(entry);
+  if(!actual) return null;
+  let worst = null;
+  STAGES.forEach(s=>{
+    if(!s.rateKey) return;
+    const a = actual[s.rateKey];
+    const target = rates[s.rateKey];
+    if(a === null || a === undefined) return;
+    const gap = target - a; // positive means underperforming
+    if(worst === null || gap > worst.gap){
+      worst = {stage:s, actual:a, target, gap};
+    }
+  });
+  return worst;
+}
+
+function callToAction(){
+  document.dispatchEvent(new CustomEvent("go:render"));
+}
+
+/* ============================= AI CALL HELPER ============================= */
+
+// API key management for standalone deployments (GitHub Pages, etc.) — a "bring your own key"
+// pattern. The key lives ONLY in this browser's localStorage: it's never bundled in the file
+// uploaded to GitHub, never included in backups, and never sent anywhere except directly to
+// Anthropic's API. Inside Claude's artifact environment this is never used — the fetch call
+// there is already authenticated automatically, no key needed.
+function getApiKey(){
+  try{ return localStorage.getItem("gos-anthropic-api-key") || ""; }catch(e){ return ""; }
+}
+function setApiKey(key){
+  try{ localStorage.setItem("gos-anthropic-api-key", key.trim()); }catch(e){}
+}
+function promptForApiKey(){
+  const current = getApiKey();
+  const key = prompt(
+    "Cole sua chave de API da Anthropic (começa com sk-ant-...).\n\nEla fica salva SOMENTE neste navegador — nunca é enviada para nenhum lugar além da própria Anthropic. Pegue a sua em console.anthropic.com → API Keys.",
+    current
+  );
+  if(key !== null){ setApiKey(key); }
+  return getApiKey();
+}
+
+async function callClaude(systemPrompt, userPrompt, maxTokens){
+  const headers = {"Content-Type":"application/json"};
+  if(STANDALONE_MODE){
+    let key = getApiKey();
+    if(!key) key = promptForApiKey();
+    if(!key) throw new Error("É necessário configurar uma chave de API da Anthropic para usar os recursos de IA nesta versão.");
+    headers["x-api-key"] = key;
+    headers["anthropic-dangerous-direct-browser-access"] = "true";
+  }
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: maxTokens || 1000,
+      system: systemPrompt,
+      messages: [{role:"user", content:userPrompt}]
+    })
+  });
+  if(!response.ok){
+    if(STANDALONE_MODE && (response.status === 401 || response.status === 403)){
+      throw new Error("Chave de API inválida ou sem permissão. Confira em console.anthropic.com e configure novamente.");
+    }
+    throw new Error("Falha na chamada de IA ("+response.status+")");
+  }
+  const data = await response.json();
+  const textBlocks = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text);
+  return textBlocks.join("\n");
+}
+
+// Aggregates the FULL history (not just the latest week) into averages and trend direction per KPI,
+// so AI modules can reason about years of data instead of a single snapshot.
+function historicalStats(){
+  const entries = state.entries;
+  if(!entries.length) return null;
+  const n = entries.length;
+  const fields = [...STAGES, ...EXTRA_KPI_FIELDS].map(f=>f.key);
+
+  function avgOfSet(set, key){
+    const vals = set.map(e=>e[key]).filter(v=>v!==null&&v!==undefined&&!isNaN(v));
+    if(!vals.length) return null;
+    return vals.reduce((a,b)=>a+b,0)/vals.length;
+  }
+
+  const half = Math.max(1, Math.floor(n/2));
+  const firstHalf = entries.slice(0, half);
+  const secondHalf = entries.slice(half);
+
+  const avg = {}, trendPct = {};
+  fields.forEach(key=>{
+    avg[key] = avgOfSet(entries, key);
+    const a = avgOfSet(firstHalf, key);
+    const b = avgOfSet(secondHalf, key);
+    trendPct[key] = (a===null || b===null || a===0) ? null : ((b-a)/a)*100;
+  });
+
+  const loansVals = entries.map(e=>e.loans).filter(v=>v!==null&&v!==undefined);
+  return {
+    weeks: n,
+    avg, trendPct,
+    bestLoans: loansVals.length ? Math.max(...loansVals) : null,
+    worstLoans: loansVals.length ? Math.min(...loansVals) : null,
+  };
+}
+
+/* ============================= STATISTICAL ANALYSIS ENGINE ============================= */
+// This is what makes the tool behave like a senior data analyst instead of a rule-of-thumb
+// dashboard: real correlation across the full history (which levers actually move loans),
+// and linear regression to forecast where the business is headed if nothing changes.
+
+const DRIVER_FIELDS = [
+  {key:"leads", label:"Leads"},
+  {key:"qualifiedLeads", label:"Qualified Leads"},
+  {key:"appointments", label:"Appointments"},
+  {key:"applications", label:"Applications"},
+  {key:"preApprovals", label:"Pre Approvals"},
+  {key:"clearToClose", label:"Clear To Close"},
+  {key:"marketingSpend", label:"Marketing Spend"},
+  {key:"cac", label:"CAC"},
+  {key:"responseTime", label:"Response Time"},
+  {key:"loanOfficers", label:"Loan Officers"},
+  {key:"realtorPartners", label:"Realtor Partners"},
+];
+
+function pearson(xs, ys){
+  const pairs = xs.map((x,i)=>[x, ys[i]]).filter(([x,y])=> x!==null&&x!==undefined&&y!==null&&y!==undefined&&!isNaN(x)&&!isNaN(y));
+  const n = pairs.length;
+  if(n < 5) return null;
+  const xc = pairs.map(p=>p[0]), yc = pairs.map(p=>p[1]);
+  const meanX = xc.reduce((a,b)=>a+b,0)/n;
+  const meanY = yc.reduce((a,b)=>a+b,0)/n;
+  let num=0, denX=0, denY=0;
+  for(let i=0;i<n;i++){
+    const dx = xc[i]-meanX, dy = yc[i]-meanY;
+    num += dx*dy; denX += dx*dx; denY += dy*dy;
+  }
+  if(denX===0 || denY===0) return null;
+  return {r: num/Math.sqrt(denX*denY), n};
+}
+
+function corrStrength(r){
+  const a = Math.abs(r);
+  if(a >= 0.7) return "forte";
+  if(a >= 0.4) return "moderada";
+  if(a >= 0.2) return "fraca";
+  return "desprezível";
+}
+
+// Ranks every KPI by how strongly it historically correlates with Loans closed —
+// this answers "what actually moves the outcome", not just "what has the worst conversion gap".
+function driverAnalysis(){
+  const entries = state.entries;
+  if(entries.length < 5) return null;
+  const loansArr = entries.map(e=>e.loans);
+  const results = DRIVER_FIELDS.map(f=>{
+    const arr = entries.map(e=>e[f.key]);
+    const c = pearson(arr, loansArr);
+    return c ? {key:f.key, label:f.label, r:c.r, n:c.n} : null;
+  }).filter(Boolean);
+  results.sort((a,b)=> Math.abs(b.r) - Math.abs(a.r));
+  return results;
+}
+
+// Simple linear regression of a metric against week index (0,1,2...), used to forecast trend.
+function linearTrend(entries, key){
+  const vals = entries.map((e,i)=>({x:i, y:e[key]})).filter(p=> p.y!==null && p.y!==undefined && !isNaN(p.y));
+  const n = vals.length;
+  if(n < 5) return null;
+  const meanX = vals.reduce((a,p)=>a+p.x,0)/n;
+  const meanY = vals.reduce((a,p)=>a+p.y,0)/n;
+  let num=0, den=0;
+  vals.forEach(p=>{ num += (p.x-meanX)*(p.y-meanY); den += (p.x-meanX)*(p.x-meanX); });
+  const slope = den===0 ? 0 : num/den;
+  const intercept = meanY - slope*meanX;
+  const lastX = vals[vals.length-1].x;
+  return {slope, intercept, n, nextValue: slope*(lastX+1)+intercept, lastX};
+}
+
+// Full forecast for Loans: current pace, projected monthly pace if trend holds, and how many
+// weeks (at current slope) it would take to close the gap to the monthly target.
+function loansForecast(){
+  const entries = state.entries;
+  const trend = linearTrend(entries, "loans");
+  if(!trend) return null;
+  const weeklyTargetNow = state.meta.targetLoans / 4.33;
+  const projectedNextWeek = Math.max(0, trend.nextValue);
+  const projectedMonthlyPace = projectedNextWeek * 4.33;
+  let weeksToTarget = null;
+  if(trend.slope > 0.0001){
+    weeksToTarget = Math.max(0, Math.ceil((weeklyTargetNow - projectedNextWeek) / trend.slope));
+  }
+  return {
+    slopePerWeek: trend.slope,
+    projectedNextWeek, projectedMonthlyPace,
+    weeklyTargetNow, weeksToTarget,
+    direction: trend.slope > 0.05 ? "subindo" : trend.slope < -0.05 ? "caindo" : "estável",
+  };
+}
+
+function buildDataContext(){
+  const e = latestEntry();
+  const prev = previousEntry();
+  const rates = state.rates;
+  const targets = reverseTargets(state.meta.targetLoans, rates);
+  const weekly = weeklyOf(targets);
+  let ctx = `Empresa: ${state.meta.companyName}\nMeta mensal de loans: ${state.meta.targetLoans}\n\n`;
+  if(e){
+    ctx += "DADOS DA SEMANA MAIS RECENTE (" + (e.weekLabel||"sem rótulo") + "):\n";
+    STAGES.forEach(s=>{ ctx += `- ${s.label}: ${e[s.key]??"—"}\n`; });
+    EXTRA_KPI_FIELDS.forEach(f=>{ ctx += `- ${f.label}: ${e[f.key]??"—"}\n`; });
+    const comp = weekCompleteness(e);
+    if(!comp.isComplete){
+      ctx += `\nATENÇÃO — QUALIDADE DE DADOS: esta semana está incompleta. Faltam ${comp.missing.length} campo(s): ${comp.missing.map(f=>f.label).join(", ")}. Mencione essa limitação na análise em vez de tratar os cálculos que dependem desses campos como confiáveis.\n`;
+    }
+    ctx += "\nTAXAS DE CONVERSÃO REAIS DESTA SEMANA (%):\n";
+    const ac = actualConversionRates(e);
+    STAGES.forEach(s=>{ if(s.rateKey) ctx += `- ${s.rateLabel}: ${ac[s.rateKey]!==null&&ac[s.rateKey]!==undefined?ac[s.rateKey].toFixed(1):"—"}%\n`; });
+    ctx += "\nTAXAS DE CONVERSÃO ALVO CONFIGURADAS (%):\n";
+    STAGES.forEach(s=>{ if(s.rateKey) ctx += `- ${s.rateLabel}: ${rates[s.rateKey]}%\n`; });
+    ctx += "\nMETAS SEMANAIS (engenharia reversa para bater a meta mensal):\n";
+    STAGES.forEach(s=>{ ctx += `- ${s.label}: ${Math.round(weekly[s.key]||0)}\n`; });
+  } else {
+    ctx += "Nenhum dado semanal foi preenchido ainda.\n";
+  }
+  if(prev){
+    ctx += "\nSEMANA ANTERIOR (" + (prev.weekLabel||"sem rótulo") + ") para comparação:\n";
+    STAGES.forEach(s=>{ ctx += `- ${s.label}: ${prev[s.key]??"—"}\n`; });
+  }
+  const hist = historicalStats();
+  if(hist && hist.weeks > 2){
+    ctx += `\nHISTÓRICO COMPLETO (${hist.weeks} semanas registradas no sistema — use isso para enxergar tendência, sazonalidade e desempenho ao longo do tempo, não só a semana atual):\n`;
+    STAGES.forEach(s=>{
+      const avg = hist.avg[s.key], trend = hist.trendPct[s.key];
+      ctx += `- ${s.label}: média histórica ${avg!==null?Math.round(avg):"—"} | tendência (1ª metade do histórico vs 2ª metade): ${trend!==null?(trend>=0?"+":"")+trend.toFixed(1)+"%":"—"}\n`;
+    });
+    ctx += `- Melhor semana em loans (5 anos de histórico): ${hist.bestLoans??"—"} | Pior semana em loans: ${hist.worstLoans??"—"}\n`;
+  }
+  const drivers = driverAnalysis();
+  if(drivers && drivers.length){
+    ctx += `\nANÁLISE DE CORRELAÇÃO (quais KPIs mais se movem junto com Loans fechados, calculado sobre todo o histórico, n=${drivers[0].n} semanas — correlação NÃO implica causalidade, mas indica onde investigar primeiro):\n`;
+    drivers.slice(0,6).forEach(d=>{
+      ctx += `- ${d.label}: r=${d.r.toFixed(2)} (${corrStrength(d.r)}, ${d.r>=0?'correlação positiva':'correlação negativa'})\n`;
+    });
+  }
+  const forecast = loansForecast();
+  if(forecast){
+    ctx += `\nPROJEÇÃO ESTATÍSTICA (regressão linear sobre Loans ao longo do tempo):\n`;
+    ctx += `- Tendência: ${forecast.direction} a uma taxa de ${forecast.slopePerWeek.toFixed(2)} loans/semana\n`;
+    ctx += `- Projeção para a próxima semana: ${forecast.projectedNextWeek.toFixed(1)} loans (ritmo mensal projetado: ${Math.round(forecast.projectedMonthlyPace)})\n`;
+    ctx += `- Meta semanal atual: ${forecast.weeklyTargetNow.toFixed(1)} loans\n`;
+    ctx += `- ${forecast.weeksToTarget!==null ? `No ritmo de melhora atual, faltam aproximadamente ${forecast.weeksToTarget} semanas para atingir a meta semanal` : `No ritmo atual, a tendência NÃO está convergindo para a meta — a empresa está estagnada ou piorando`}\n`;
+  }
+  return ctx;
+}
+
+/* ============================= SIDEBAR ============================= */
+
+function renderSidebar(){
+  const sb = document.getElementById("sidebar");
+  const completedCount = PLAYBOOK_ORDER.filter(isComplete).length;
+  const pct = Math.round((completedCount/PLAYBOOK_ORDER.length)*100);
+  let html = `<div class="brand">
+    <div class="name">${esc(state.meta.companyName)}</div>
+    <div class="tag">Growth Operating System</div>
+    <button class="mobile-toggle" id="mobile-toggle" aria-label="Abrir menu">&#9776;</button>
+  </div>
+  <div class="workspace-switch">
+    <select id="workspace-select" title="Trocar de empresa">
+      ${workspaces.map(w=>`<option value="${w.id}" ${w.id===activeWorkspaceId?'selected':''}>${esc(w.name)}</option>`).join("")}
+    </select>
+    <button id="btn-new-workspace" title="Adicionar nova empresa">+</button>
+    ${workspaces.length>1?`<button id="btn-del-workspace" title="Remover esta empresa">&times;</button>`:''}
+  </div>
+  <div class="sidebar-progress">
+    <div class="lbl">${completedCount}/${PLAYBOOK_ORDER.length} etapas concluídas</div>
+    <div class="bartrack"><div class="barfill" style="width:${pct}%"></div></div>
+  </div>
+  ${STANDALONE_MODE ? `<div style="padding:0 22px 14px 22px;">
+    <button id="btn-config-api-key" class="sidebar-key-btn">${getApiKey()?'🔑 Chave de API configurada':'🔑 Configurar chave de API'}</button>
+    <div class="sidebar-privacy-note">🔒 Dados salvos só neste navegador/dispositivo — não são enviados a nenhum servidor além da Anthropic (só quando você usa IA). Baixe backups com frequência.</div>
+  </div>` : ''}`;
+  NAV.forEach(group=>{
+    html += `<div class="navgroup"><div class="navlabel">${group.group}</div>`;
+    group.items.forEach(item=>{
+      const done = isComplete(item.id);
+      html += `<div class="navitem ${activeTab===item.id?'active':''}" data-nav="${item.id}" title="${esc(COMPLETION_CRITERIA[item.id]||'')}">
+        <span class="navnum ${done?'done':''}">${done?'&#10003;':stepNumber(item.id)}</span>${trm(item.label)}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  sb.innerHTML = html;
+}
+
+/* ============================= ROUTER ============================= */
+
+const RENDERERS = {}; // filled in below by each module
+
+function renderMain(){
+  const main = document.getElementById("main");
+  const fn = RENDERERS[activeTab];
+  const inner = fn ? fn() : "<div class='empty'>Módulo não encontrado.</div>";
+  main.innerHTML = guidedBannerHtml(activeTab) + inner + nextStepCalloutHtml(activeTab);
+}
+
+function rerender(){
+  document.title = "Growth OS — " + state.meta.companyName;
+  renderSidebar();
+  renderMain();
+  bindEvents();
+}
+
+async function withButtonLoading(btn, label, fn){
+  if(!btn) return fn();
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = label;
+  try{ await fn(); }
+  catch(err){ alert("Não foi possível gerar agora: " + err.message); }
+  finally{ if(btn.isConnected){ btn.disabled = false; btn.textContent = orig; } }
+}
+
+function bindEvents(){
+  document.querySelectorAll('.navitem').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      activeTab = el.dataset.nav;
+      document.getElementById('sidebar')?.classList.remove('mobile-open');
+      rerender();
+      window.scrollTo(0,0);
+    });
+  });
+  const mobileToggle = document.getElementById('mobile-toggle');
+  if(mobileToggle) mobileToggle.addEventListener('click', ()=>{
+    document.getElementById('sidebar').classList.toggle('mobile-open');
+  });
+  document.querySelectorAll('[data-goto]').forEach(el=>{
+    el.addEventListener('click', ()=>{ activeTab = el.dataset.goto; rerender(); window.scrollTo(0,0); });
+  });
+  document.querySelectorAll('[data-goto-step]').forEach(el=>{
+    el.addEventListener('click', ()=>{ activeTab = el.dataset.gotoStep; rerender(); window.scrollTo(0,0); });
+  });
+  const brandName = document.querySelector('#sidebar .brand .name');
+  if(brandName){
+    brandName.style.cursor = "pointer";
+    brandName.title = "Clique para renomear a empresa";
+    brandName.addEventListener('click', ()=>{
+      const v = prompt("Nome da empresa:", state.meta.companyName);
+      if(v && v.trim()){
+        state.meta.companyName = v.trim();
+        persist('meta');
+        const w = workspaces.find(x=>x.id===activeWorkspaceId);
+        if(w){ w.name = v.trim(); persistWorkspacesList(); }
+        rerender();
+      }
+    });
+  }
+
+  const apiKeyBtn = document.getElementById('btn-config-api-key');
+  if(apiKeyBtn) apiKeyBtn.addEventListener('click', ()=>{
+    promptForApiKey();
+    rerender();
+  });
+
+  const wsSelect = document.getElementById('workspace-select');
+  if(wsSelect) wsSelect.addEventListener('change', ()=>{ switchWorkspace(wsSelect.value); });
+
+  const newWsBtn = document.getElementById('btn-new-workspace');
+  if(newWsBtn) newWsBtn.addEventListener('click', ()=>{
+    const name = prompt("Nome da nova empresa:");
+    if(name && name.trim()) createWorkspace(name.trim());
+  });
+
+  const delWsBtn = document.getElementById('btn-del-workspace');
+  if(delWsBtn) delWsBtn.addEventListener('click', ()=>{
+    const w = workspaces.find(x=>x.id===activeWorkspaceId);
+    if(!w) return;
+    if(confirm(`Remover "${w.name}" e todos os seus dados deste sistema? Essa ação não pode ser desfeita.`)){
+      deleteWorkspace(activeWorkspaceId);
+    }
+  });
+
+  const main = document.getElementById('main');
+  if(!main) return;
+
+  /* ---------- DASHBOARD ---------- */
+  if(activeTab === "dashboard"){
+    const btnSave = document.getElementById('btn-save-entry');
+    if(btnSave) btnSave.addEventListener('click', ()=>{
+      const weekLabel = document.getElementById('week-label').value.trim();
+      const weekStartDate = document.getElementById('week-date').value || null;
+      const entry = {weekLabel, weekStartDate};
+      [...STAGES, ...EXTRA_KPI_FIELDS].forEach(f=>{
+        const el = document.getElementById('in-'+f.key);
+        const v = el.value === "" ? null : Number(el.value);
+        entry[f.key] = v;
+      });
+
+      const negativeFields = [...STAGES, ...EXTRA_KPI_FIELDS].filter(f => entry[f.key] !== null && entry[f.key] < 0).map(f=>f.label);
+      const funnelIssues = [];
+      for(let k=1;k<FUNNEL_ORDER.length;k++){
+        const prevKey = FUNNEL_ORDER[k-1], curKey = FUNNEL_ORDER[k];
+        const prevVal = entry[prevKey], curVal = entry[curKey];
+        if(prevVal!==null && prevVal!==undefined && curVal!==null && curVal!==undefined && curVal > prevVal){
+          const prevLabel = ALL_ENTRY_FIELDS.find(f=>f.key===prevKey).label;
+          const curLabel = ALL_ENTRY_FIELDS.find(f=>f.key===curKey).label;
+          funnelIssues.push(`${curLabel} (${curVal}) maior que ${prevLabel} (${prevVal})`);
+        }
+      }
+      if(negativeFields.length || funnelIssues.length){
+        const msgs = [];
+        if(negativeFields.length) msgs.push(`${negativeFields.join(", ")} está(ão) negativo(s)`);
+        if(funnelIssues.length) msgs.push(`funil ilógico: ${funnelIssues.join("; ")}`);
+        const proceed = confirm(`Atenção — provável erro de digitação:\n${msgs.join("\n")}\n\nSalvar assim mesmo?`);
+        if(!proceed) return;
+      }
+      if(formSourceId && state.entries.some(x=>x.id===formSourceId)){
+        entry.id = formSourceId;
+        const idx = state.entries.findIndex(x=>x.id===formSourceId);
+        state.entries[idx] = entry;
+        formSourceId = null;
+      } else {
+        const existingIdx = state.entries.findIndex(e=> e.weekLabel && weekLabel && e.weekLabel.toLowerCase()===weekLabel.toLowerCase());
+        if(existingIdx !== -1){
+          entry.id = state.entries[existingIdx].id;
+          state.entries[existingIdx] = entry;
+        } else {
+          entry.id = uid();
+          state.entries.push(entry);
+        }
+      }
+      persist('entries');
+      rerender();
+    });
+
+    const weekDateInput = document.getElementById('week-date');
+    if(weekDateInput) weekDateInput.addEventListener('change', ()=>{
+      const generated = formatWeekLabelFromDate(weekDateInput.value);
+      if(generated) document.getElementById('week-label').value = generated;
+    });
+
+    const cancelBtn = document.getElementById('btn-cancel-edit');
+    if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ formSourceId = null; rerender(); });
+
+    const newWeekBtn = document.getElementById('btn-new-week');
+    if(newWeekBtn) newWeekBtn.addEventListener('click', ()=>{ formSourceId = null; rerender(); window.scrollTo(0,0); });
+
+    main.querySelectorAll('[data-edit-entry]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        formSourceId = b.dataset.editEntry;
+        rerender();
+        window.scrollTo(0,0);
+      });
+    });
+    main.querySelectorAll('[data-del-entry]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        if(!confirm("Excluir esta semana do histórico? Essa ação não pode ser desfeita.")) return;
+        state.entries = state.entries.filter(x=>x.id!==b.dataset.delEntry);
+        if(formSourceId === b.dataset.delEntry) formSourceId = null;
+        persist('entries');
+        rerender();
+      });
+    });
+
+    const templateBtn = document.getElementById('btn-download-template');
+    if(templateBtn) templateBtn.addEventListener('click', downloadCSVTemplate);
+
+    const importBtn = document.getElementById('btn-import-csv');
+    const fileInput = document.getElementById('csv-file-input');
+    if(importBtn && fileInput){
+      importBtn.addEventListener('click', ()=> fileInput.click());
+      fileInput.addEventListener('change', ()=>{
+        const file = fileInput.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try{
+            const parsed = parseCSV(reader.result);
+            const {entries: newEntries, issues} = csvRowsToEntries(parsed);
+            if(!newEntries.length){
+              importSummaryHtml = `<div class="empty" style="margin-top:14px;">Nenhuma linha reconhecida. Confira se os cabeçalhos da planilha batem com o modelo (baixe o modelo CSV para conferir).</div>`;
+              rerender();
+              return;
+            }
+            let added = 0, updated = 0;
+            newEntries.forEach(entry=>{
+              const idx = state.entries.findIndex(e2=> e2.weekLabel && entry.weekLabel && e2.weekLabel.toLowerCase()===entry.weekLabel.toLowerCase());
+              if(idx !== -1){ entry.id = state.entries[idx].id; state.entries[idx] = entry; updated++; }
+              else { state.entries.push(entry); added++; }
+            });
+            persist('entries');
+            importSummaryHtml = buildImportSummaryHtml(added, updated, issues);
+            rerender();
+          }catch(err){
+            importSummaryHtml = `<div class="empty" style="margin-top:14px;">Não foi possível ler o arquivo: ${esc(err.message)}. Confira se é um CSV válido.</div>`;
+            rerender();
+          }
+          fileInput.value = "";
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+    }
+
+    const exportCsvBtn = document.getElementById('btn-export-csv-history');
+    if(exportCsvBtn) exportCsvBtn.addEventListener('click', ()=>{
+      if(!state.entries.length){ alert("Não há semanas para exportar ainda."); return; }
+      exportEntriesCSV();
+    });
+
+    const exportBackupBtn = document.getElementById('btn-export-backup');
+    if(exportBackupBtn) exportBackupBtn.addEventListener('click', ()=>{
+      exportBackupJSON();
+      backupSummaryHtml = `<div class="ai-block" style="margin-top:14px;"><h4>Backup baixado</h4><div class="txt">Guarde este arquivo .json em local seguro. Ele contém todos os módulos de "${esc(state.meta.companyName)}" e pode ser restaurado a qualquer momento com o botão "Restaurar backup".</div></div>`;
+      rerender();
+    });
+
+    const importBackupBtn = document.getElementById('btn-import-backup');
+    const backupFileInput = document.getElementById('backup-file-input');
+    if(importBackupBtn && backupFileInput){
+      importBackupBtn.addEventListener('click', ()=> backupFileInput.click());
+      backupFileInput.addEventListener('change', ()=>{
+        const file = backupFileInput.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try{
+            const restored = await importBackupJSON(reader.result);
+            if(restored){
+              backupSummaryHtml = `<div class="ai-block" style="margin-top:14px;"><h4>Backup restaurado</h4><div class="txt">Todos os dados de "${esc(state.meta.companyName)}" foram substituídos pelo conteúdo do backup.</div></div>`;
+              formSourceId = null;
+              rerender();
+            }
+          }catch(err){
+            backupSummaryHtml = `<div class="empty" style="margin-top:14px;">Não foi possível restaurar: ${esc(err.message)}</div>`;
+            rerender();
+          }
+          backupFileInput.value = "";
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+    }
+  }
+
+  /* ---------- AI GROWTH ANALYSIS ---------- */
+  if(activeTab === "ai-analysis"){
+    const btn = document.getElementById('btn-gen-analysis');
+    if(btn) btn.addEventListener('click', async ()=>{
+      await withButtonLoading(btn, "Gerando análise...", async ()=>{
+        const ctx = buildDataContext();
+        const system = "Você é um analista de dados sênior e Chief Growth Officer (estilo McKinsey, Bain, BCG, Deloitte) especializado em growth operations para empresas de serviços, com foco atual em uma empresa de mortgage/hipotecas. Você raciocina com rigor estatístico: baseia conclusões em correlações, tendências e projeções reais fornecidas, não em suposições genéricas, e é honesto quando os dados são insuficientes para uma conclusão forte. Responda sempre em português do Brasil, de forma direta, executiva e acionável, sem markdown de código.";
+        const user = ctx + "\n\nCom base nesses dados — especialmente na ANÁLISE DE CORRELAÇÃO e na PROJEÇÃO ESTATÍSTICA, quando presentes — responda objetivamente e em tópicos curtos, numerando de 1 a 7, cada uma das perguntas abaixo, nesta ordem exata:\n1. Qual é o maior gargalo da empresa?\n2. Onde estamos perdendo clientes?\n3. Qual KPI merece prioridade?\n4. Qual ação gera maior impacto?\n5. O que NÃO devemos fazer?\n6. Quais riscos existem?\n7. Quais oportunidades existem?\n\nSempre que citar um KPI como prioridade, referencie o coeficiente de correlação (r) ou a tendência estatística que sustenta essa escolha, não apenas o gap de conversão. Seja específico, cite os números fornecidos e estime impacto financeiro ou quantitativo sempre que possível. Se a correlação for fraca ou os dados forem insuficientes para uma etapa, diga isso claramente em vez de inventar uma conclusão.";
+        const text = await callClaude(system, user, 1400);
+        state.aiAnalysis = text;
+        state.aiAnalysisDate = new Date().toLocaleString('pt-BR');
+        await persist('aiAnalysis');
+        rerender();
+      });
+    });
+  }
+
+  /* ---------- REVERSE ENGINEERING ---------- */
+  if(activeTab === "reverse-eng"){
+    const targetInput = document.getElementById('target-loans');
+    if(targetInput) targetInput.addEventListener('change', ()=>{
+      state.meta.targetLoans = Math.max(1, Number(targetInput.value)||1);
+      persist('meta'); rerender();
+    });
+    STAGES.filter(s=>s.rateKey).forEach(s=>{
+      const el = document.getElementById('rate-'+s.rateKey);
+      if(el) el.addEventListener('change', ()=>{
+        state.rates[s.rateKey] = Math.min(100, Math.max(0.1, Number(el.value)||1));
+        persist('rates'); rerender();
+      });
+    });
+    const resetBtn = document.getElementById('btn-reset-rates');
+    if(resetBtn) resetBtn.addEventListener('click', ()=>{
+      state.rates = {...DEFAULT_RATES};
+      persist('rates'); rerender();
+    });
+    const confirmBtn = document.getElementById('btn-confirm-rates');
+    if(confirmBtn) confirmBtn.addEventListener('click', ()=>{
+      state.progress.reverseEng = true;
+      persist('progress'); rerender();
+    });
+  }
+
+  /* ---------- WEEKLY SCORECARD ---------- */
+  if(activeTab === "scorecard"){
+    const genBtn = document.getElementById('btn-gen-scorecard');
+    if(genBtn) genBtn.addEventListener('click', ()=>{
+      const e = latestEntry();
+      if(!e){ alert("Preencha uma semana no Executive Dashboard primeiro."); return; }
+      const weekly = weeklyOf(reverseTargets(state.meta.targetLoans, state.rates));
+      const rows = STAGES.map(s=>({
+        id: uid(), kpi: s.label, meta: Math.round(weekly[s.key]||0), resultado: e[s.key]??null,
+        prioridade: null, responsavel: "", status: health(e[s.key], weekly[s.key])==="green"?"No prazo":health(e[s.key],weekly[s.key])==="yellow"?"Atenção":"Atrasado",
+        comentarios: ""
+      }));
+      // assign priority by worst gap first
+      const withGap = rows.map(r=>({r, gap: (r.resultado==null?999:(r.meta-r.resultado))}));
+      withGap.sort((a,b)=>b.gap-a.gap);
+      withGap.forEach((item, idx)=>{ item.r.prioridade = idx+1; });
+      state.scorecard = rows;
+      persist('scorecard'); rerender();
+    });
+    const addBtn = document.getElementById('btn-add-row');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      state.scorecard.push({id:uid(), kpi:"", meta:null, resultado:null, prioridade:null, responsavel:"", status:"No prazo", comentarios:""});
+      persist('scorecard'); rerender();
+    });
+    main.querySelectorAll('tr[data-row-id]').forEach(tr=>{
+      const id = tr.dataset.rowId;
+      tr.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const row = state.scorecard.find(r=>r.id===id);
+          if(!row) return;
+          const field = inp.dataset.field;
+          row[field] = (inp.type==='number') ? (inp.value===""?null:Number(inp.value)) : inp.value;
+          persist('scorecard'); rerender();
+        });
+      });
+      const delBtn = tr.querySelector('[data-del-row]');
+      if(delBtn) delBtn.addEventListener('click', ()=>{
+        state.scorecard = state.scorecard.filter(r=>r.id!==id);
+        persist('scorecard'); rerender();
+      });
+    });
+  }
+
+  /* ---------- GROWTH ACTION PLAN ---------- */
+  if(activeTab === "action-plan"){
+    const rulesBtn = document.getElementById('btn-gen-plan-rules');
+    if(rulesBtn) rulesBtn.addEventListener('click', ()=>{
+      const plan = ruleBasedActionPlan();
+      if(!plan.length){ alert("Preencha uma semana no Executive Dashboard primeiro."); return; }
+      state.actionPlan = plan;
+      persist('actionPlan'); rerender();
+    });
+    const aiBtn = document.getElementById('btn-gen-plan-ai');
+    if(aiBtn) aiBtn.addEventListener('click', async ()=>{
+      await withButtonLoading(aiBtn, "Gerando plano...", async ()=>{
+        const ctx = buildDataContext();
+        const system = "Você é um Chief Growth Officer especializado em growth operations para empresas de serviços (foco em mortgage). Responda ESTRITAMENTE em JSON válido, sem markdown, sem comentários, sem texto fora do JSON, com conteúdo em português do Brasil.";
+        const user = ctx + "\n\nGere um plano de ação de crescimento com até 10 prioridades, ordenadas da maior para a menor prioridade de impacto, para atingir a meta mensal de loans. Responda como um array JSON de objetos com as chaves: title (ação curta e específica, em português), impact (string curta, ex: '+12 loans' ou '-30% CAC'), responsible (área ou papel, em português, ex: 'Vendas', 'Marketing', 'Operações'), deadline (string curta, ex: '15 dias'). Não inclua texto além do array JSON.";
+        const raw = await callClaude(system, user, 1600);
+        const arr = parseJSONLoose(raw);
+        state.actionPlan = arr.slice(0,10).map(p=>({id:uid(), title:p.title||"", impact:p.impact||"", responsible:p.responsible||"", deadline:p.deadline||"", status:"Não iniciado"}));
+        await persist('actionPlan');
+        rerender();
+      });
+    });
+    const addPlanBtn = document.getElementById('btn-add-plan');
+    if(addPlanBtn) addPlanBtn.addEventListener('click', ()=>{
+      if(state.actionPlan.length>=10) return;
+      state.actionPlan.push({id:uid(), title:"Nova prioridade", impact:"", responsible:"", deadline:"", status:"Não iniciado"});
+      persist('actionPlan'); rerender();
+    });
+    main.querySelectorAll('.priority-card[data-plan-id]').forEach(card=>{
+      const id = card.dataset.planId;
+      card.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const p = state.actionPlan.find(x=>x.id===id);
+          if(!p) return;
+          p[inp.dataset.field] = inp.value;
+          persist('actionPlan'); rerender();
+        });
+      });
+      const del = card.querySelector('[data-del-plan]');
+      if(del) del.addEventListener('click', ()=>{
+        state.actionPlan = state.actionPlan.filter(x=>x.id!==id);
+        persist('actionPlan'); rerender();
+      });
+    });
+  }
+
+  /* ---------- AI WEEKLY COACH ---------- */
+  if(activeTab === "weekly-coach"){
+    const btn = document.getElementById('btn-gen-coach');
+    if(btn) btn.addEventListener('click', async ()=>{
+      await withButtonLoading(btn, "Gerando coach...", async ()=>{
+        const ctx = buildDataContext();
+        const system = "Você é um coach executivo de growth e analista de dados sênior para uma empresa de mortgage. Sempre que houver dados de correlação ou projeção estatística fornecidos, use-os para embasar suas conclusões em vez de generalizações. Responda sempre em português do Brasil, direto e específico, sem markdown de código.";
+        const user = ctx + "\n\nEscreva o Weekly Coach desta semana usando exatamente estas seções, cada uma com o título seguido de um parágrafo curto:\nResumo executivo\nO que aconteceu esta semana\nO que melhorou\nO que piorou\nMaior gargalo\nMaior oportunidade\nPlano da próxima semana\n\nCite os números fornecidos sempre que relevante.";
+        const text = await callClaude(system, user, 1400);
+        state.coachHistory.push({id:uid(), date:new Date().toLocaleString('pt-BR'), text});
+        await persist('coachHistory');
+        rerender();
+      });
+    });
+  }
+
+  /* ---------- MEETING ASSISTANT ---------- */
+  if(activeTab === "meetings"){
+    const btn = document.getElementById('btn-gen-meeting');
+    if(btn) btn.addEventListener('click', async ()=>{
+      const title = document.getElementById('meeting-title').value.trim() || "Reunião";
+      const date = document.getElementById('meeting-date').value;
+      const notes = document.getElementById('meeting-notes').value.trim();
+      if(!notes){ alert("Cole as notas da reunião antes de gerar o resumo."); return; }
+      await withButtonLoading(btn, "Gerando resumo...", async ()=>{
+        const system = "Você organiza notas de reuniões corporativas. Responda ESTRITAMENTE em JSON válido, sem markdown, sem texto fora do JSON, em português do Brasil.";
+        const user = "Notas da reunião:\n" + notes + "\n\nRetorne um objeto JSON com as chaves: summary (resumo em 2-4 frases), decisions (decisões tomadas), responsible (quem ficou responsável por quê), pending (pendências em aberto), nextSteps (próximos passos). Se não houver informação suficiente para alguma seção, escreva 'Nenhuma informação identificada.'";
+        const raw = await callClaude(system, user, 1000);
+        const obj = parseJSONLoose(raw);
+        state.meetings.push({id:uid(), title, date, notes, summary:obj.summary||"", decisions:obj.decisions||"", responsible:obj.responsible||"", pending:obj.pending||"", nextSteps:obj.nextSteps||""});
+        await persist('meetings');
+        rerender();
+      });
+    });
+    main.querySelectorAll('[data-del-meeting]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        state.meetings = state.meetings.filter(m=>m.id!==b.dataset.delMeeting);
+        persist('meetings'); rerender();
+      });
+    });
+  }
+
+  /* ---------- EXPERIMENTS ---------- */
+  if(activeTab === "experiments"){
+    const addBtn = document.getElementById('btn-add-exp');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      state.experiments.push({id:uid(), hypothesis:"", objective:"", expected:"", actual:"", learning:"", decision:""});
+      persist('experiments'); rerender();
+    });
+    main.querySelectorAll('tr[data-exp-id]').forEach(tr=>{
+      const id = tr.dataset.expId;
+      tr.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const row = state.experiments.find(r=>r.id===id);
+          if(!row) return;
+          row[inp.dataset.field] = inp.value;
+          persist('experiments'); rerender();
+        });
+      });
+      const del = tr.querySelector('[data-del-exp]');
+      if(del) del.addEventListener('click', ()=>{
+        state.experiments = state.experiments.filter(r=>r.id!==id);
+        persist('experiments'); rerender();
+      });
+    });
+  }
+
+  /* ---------- SOP LIBRARY ---------- */
+  if(activeTab === "sop"){
+    main.querySelectorAll('[data-sop-filter]').forEach(p=>{
+      p.addEventListener('click', ()=>{ sopFilter = p.dataset.sopFilter; rerender(); });
+    });
+    const addBtn = document.getElementById('btn-add-sop');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      state.sops.push({id:uid(), category:"SOP", title:"Novo processo", content:""});
+      persist('sops'); rerender();
+    });
+    main.querySelectorAll('.card[data-sop-id]').forEach(card=>{
+      const id = card.dataset.sopId;
+      card.querySelectorAll('[data-field]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          const s = state.sops.find(x=>x.id===id);
+          if(!s) return;
+          s[inp.dataset.field] = inp.value;
+          persist('sops'); rerender();
+        });
+      });
+      const del = card.querySelector('[data-del-sop]');
+      if(del) del.addEventListener('click', ()=>{
+        state.sops = state.sops.filter(x=>x.id!==id);
+        persist('sops'); rerender();
+      });
+    });
+  }
+
+  /* ---------- KNOWLEDGE BASE ---------- */
+  if(activeTab === "knowledge"){
+    const search = document.getElementById('kb-search');
+    if(search) search.addEventListener('input', ()=>{
+      kbSearch = search.value;
+      const container = document.getElementById('kb-items');
+      if(container) container.innerHTML = kbItemsHtml();
+    });
+    const addNote = document.getElementById('btn-add-note');
+    if(addNote) addNote.addEventListener('click', ()=>{
+      const title = prompt("Título da nota:");
+      if(title === null) return;
+      const content = prompt("Conteúdo da nota:");
+      if(content === null) return;
+      state.kbNotes.push({id:uid(), title, content, tag:"Nota"});
+      persist('kbNotes'); rerender();
+    });
+    const concludeBtn = document.getElementById('btn-conclude-kb');
+    if(concludeBtn) concludeBtn.addEventListener('click', ()=>{
+      state.progress.knowledge = true;
+      persist('progress'); rerender();
+    });
+  }
+}
+
+/* ============================= BOOT ============================= */
+
+async function boot(){
+  document.getElementById('main').innerHTML = `<div class="empty" style="margin-top:80px;">Carregando Growth OS...</div>`;
+  try{
+    await loadWorkspacesList();
+    await loadState();
+    if(!workspaces.length){
+      // First time this runs: no workspace list exists yet. Register whatever company was
+      // already saved (or the default name) as the "default" workspace, without moving any data.
+      workspaces = [{id:"default", name: state.meta.companyName}];
+      await persistWorkspacesList();
+    }
+    if(!workspaces.find(w=>w.id===activeWorkspaceId)){
+      activeWorkspaceId = workspaces[0].id;
+      await persistActiveWorkspace();
+      state = defaultState();
+      await loadState();
+    }
+  }catch(e){ console.error(e); }
+  rerender();
+}
+
+boot();
+
+/* ============================= 1. EXECUTIVE DASHBOARD ============================= */
+
+function trendChartSvg(entries, key, label){
+  const vals = entries.map(e=> (e[key]===null||e[key]===undefined) ? null : Number(e[key]));
+  const clean = vals.map(v=>v===null?0:v);
+  const max = Math.max(...clean, 1);
+  const w = 900, h = 130, pad = 10;
+  const n = entries.length;
+  const stepX = n > 1 ? (w - pad*2) / (n-1) : 0;
+  const points = clean.map((v,i)=>{
+    const x = pad + stepX*i;
+    const y = h - pad - ((v/max) * (h - pad*2));
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const areaPoints = `${pad},${h-pad} ` + points + ` ${(pad+stepX*(n-1)).toFixed(1)},${h-pad}`;
+  const firstLabel = entries[0] ? (entries[0].weekLabel||"") : "";
+  const lastLabel = entries[n-1] ? (entries[n-1].weekLabel||"") : "";
+  return `
+  <svg viewBox="0 0 ${w} ${h+22}" style="width:100%;height:auto;display:block;">
+    <polygon points="${areaPoints}" fill="rgba(11,30,59,0.08)" stroke="none"></polygon>
+    <polyline points="${points}" fill="none" stroke="#0B1E3B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    <text x="${pad}" y="${h+16}" font-size="11" fill="#64748B" font-family="Inter,sans-serif">${esc(firstLabel)}</text>
+    <text x="${w-pad}" y="${h+16}" font-size="11" fill="#64748B" font-family="Inter,sans-serif" text-anchor="end">${esc(lastLabel)}</text>
+  </svg>`;
+}
+
+RENDERERS["dashboard"] = function(){
+  const e = latestEntry();
+  const formEntry = formSourceId ? state.entries.find(x=>x.id===formSourceId) : null;
+  const rates = state.rates;
+  const targets = reverseTargets(state.meta.targetLoans, rates);
+  const weekly = weeklyOf(targets);
+  const loansSoFar = e ? (e.loans||0) : 0;
+  const progressPct = Math.min(100, Math.round((loansSoFar/state.meta.targetLoans)*100));
+
+  const ring = `
+    <div class="ring" style="background:conic-gradient(var(--navy) ${progressPct*3.6}deg, #EDEFF3 0deg)">
+      <div class="inner">
+        <div class="n">${loansSoFar}</div>
+        <div class="l">de ${state.meta.targetLoans} loans</div>
+      </div>
+    </div>`;
+
+  const maxVal = e ? Math.max(...STAGES.map(s=>e[s.key]||0), 1) : 1;
+  const funnelRows = STAGES.map(s=>{
+    const val = e ? (e[s.key]||0) : 0;
+    const widthPct = e ? Math.max(4, Math.round((val/maxVal)*100)) : 0;
+    const convLabel = s.rateKey && e ? (()=>{ const ac=actualConversionRates(e); const v=ac[s.rateKey]; return v!==null&&v!==undefined?v.toFixed(0)+"%":"—"; })() : (s.rateKey ? "—":"");
+    return `<div class="funnel-row">
+      <div class="stage-name">${trm(s.label)}</div>
+      <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:${widthPct}%"><span>${e?fmtNum(val):''}</span></div></div>
+      <div class="funnel-conv">${convLabel? s.rateLabel.split('→')[1]?.trim()+': '+convLabel : ''}</div>
+    </div>`;
+  }).join("");
+
+  const kpiCards = STAGES.concat(EXTRA_KPI_FIELDS).map(f=>{
+    const val = e ? e[f.key] : null;
+    const wTarget = weekly[f.key];
+    const isFunnelField = STAGES.some(s=>s.key===f.key);
+    const hh = isFunnelField ? health(val, wTarget) : null;
+    const displayVal = f.prefix ? fmtMoney(val) : fmtNum(val);
+    const isMissing = e && (val===null || val===undefined);
+    let footHtml;
+    if(isMissing){
+      footHtml = `<span class="badge red"><span class="d"></span>Faltando</span>`;
+    } else if(isFunnelField && e){
+      footHtml = `Meta semana: ${Math.round(wTarget||0)} &nbsp; ${badge(hh)}`;
+    } else if(f.key==='responseTime' && val!==undefined && val!==null){
+      footHtml = val<=15?'<span class="badge green"><span class="d"></span>Rápido</span>':val<=30?'<span class="badge yellow"><span class="d"></span>Moderado</span>':'<span class="badge red"><span class="d"></span>Lento</span>';
+    } else {
+      footHtml = '&nbsp;';
+    }
+    return `<div class="kpi-card${isMissing?' missing':''}">
+      <div class="label">${trm(f.label)}</div>
+      <div class="value">${displayVal}</div>
+      <div class="foot">${footHtml}</div>
+    </div>`;
+  }).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 1</div>
+    <div class="page-title">${trm("Executive Dashboard")}</div>
+    <div class="page-sub">A visão geral do negócio. Preencha os números da semana e o sistema calcula automaticamente progresso, funil e indicadores de saúde.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Os 13 campos operacionais da semana: do lead até o loan fechado, mais receita, custo e time."],
+    ["Como preencher","Clique no calendário e marque o dia de início da semana — o rótulo é gerado automaticamente. Insira o acumulado da semana corrente (não o total do mês). Salve para atualizar todos os módulos."],
+    ["Por que preencher","Cada número alimenta o funil, o Reverse Engineering, o Scorecard e a IA. Sem dado, não há inteligência."],
+    ["Quais decisões tomar","Olhe os indicadores vermelhos primeiro — são o maior risco para bater a meta de ${state.meta.targetLoans} loans."],
+  ])}
+
+  ${missingDataBanner(e)}
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Importar histórico (CSV)</div>
+        <div class="section-help">Já tem planilhas antigas? Suba um CSV com uma linha por semana em vez de digitar tudo manualmente. Aceita vírgula, ponto e vírgula ou tabulação como separador, e reconhece números no formato brasileiro (1.234,56) ou americano (1,234.56) automaticamente. Colunas aceitas: Semana, Leads, Qualified Leads, Appointments, Applications, Pre Approvals, Clear To Close, Loans, Revenue, Marketing Spend, CAC, Response Time, Loan Officers, Realtor Partners. Depois de importar, o sistema avisa se achar coluna não reconhecida, célula quebrada, valor negativo ou funil ilógico.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn secondary small" id="btn-download-template">Baixar modelo CSV</button>
+        <button class="btn small" id="btn-import-csv">Importar CSV</button>
+        <input type="file" id="csv-file-input" accept=".csv" style="display:none;">
+      </div>
+    </div>
+    <div id="import-summary">${importSummaryHtml}</div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Backup e exportação</div>
+        <div class="section-help">Sua cópia de segurança, fora do armazenamento da ferramenta. O backup completo guarda TODOS os módulos desta empresa (${esc(state.meta.companyName)}) — Dashboard, Scorecard, Action Plan, Coach, Reuniões, Experimentos, SOPs e Knowledge Base. Guarde o arquivo em local seguro (Google Drive, computador) periodicamente.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn secondary small" id="btn-export-csv-history">Exportar histórico (CSV)</button>
+        <button class="btn secondary small" id="btn-export-backup">Baixar backup completo (.json)</button>
+        <button class="btn small" id="btn-import-backup">Restaurar backup</button>
+        <input type="file" id="backup-file-input" accept=".json" style="display:none;">
+      </div>
+    </div>
+    <div id="backup-summary">${backupSummaryHtml}</div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Preencher semana</div>
+        <div class="section-help">${formEntry ? `Editando: <b>${esc(formEntry.weekLabel||"sem rótulo")}</b> — os campos abaixo carregaram os valores dessa semana.` : "Formulário em branco para lançar uma semana nova. Para editar uma semana antiga, use a tabela de histórico abaixo."}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div>
+          <label class="field-label" style="margin-bottom:3px;">Semana começando em</label>
+          <input type="date" id="week-date" value="${formEntry?(formEntry.weekStartDate||''):''}" style="width:170px;">
+        </div>
+        <div>
+          <label class="field-label" style="margin-bottom:3px;">Rótulo (gerado automaticamente, editável)</label>
+          <input type="text" id="week-label" placeholder="Rótulo (ex: Semana 12 - Mar)" value="${esc(formEntry?formEntry.weekLabel:'')}" style="width:220px;max-width:100%;flex:1 1 160px;">
+        </div>
+        ${formEntry ? `<button class="btn secondary" id="btn-cancel-edit">Cancelar edição</button>` : ""}
+        <button class="btn" id="btn-save-entry">${formEntry?'Salvar alterações':'Salvar semana'}</button>
+      </div>
+    </div>
+    <div class="hr"></div>
+    <div class="grid g4">
+      ${STAGES.map(s=>`<div class="field"><label class="field-label">${trm(s.label)}</label><input type="number" min="0" id="in-${s.key}" value="${formEntry?(formEntry[s.key]??''):''}"></div>`).join("")}
+      ${EXTRA_KPI_FIELDS.map(f=>`<div class="field"><label class="field-label">${trm(f.label)}</label><input type="number" min="0" id="in-${f.key}" value="${formEntry?(formEntry[f.key]??''):''}"></div>`).join("")}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Progresso para a meta</div>
+    <div class="section-help">Loans fechados nesta semana vs. meta mensal de ${state.meta.targetLoans}.</div>
+    <div class="ring-wrap">
+      ${ring}
+      <div style="flex:1;">
+        <div class="grid g3">
+          <div class="kpi-card"><div class="label">Meta mensal</div><div class="value">${state.meta.targetLoans}</div></div>
+          <div class="kpi-card"><div class="label">Meta semanal</div><div class="value">${Math.round(weekly.loans)}</div></div>
+          <div class="kpi-card"><div class="label">Loans (semana atual)</div><div class="value">${loansSoFar}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Funil da semana</div>
+    <div class="section-help">Volume em cada etapa e a conversão real para a próxima etapa.</div>
+    ${e ? funnelRows : `<div class="empty">Preencha os dados da semana acima para ver o funil.<br><b>Nenhum dado ainda.</b></div>`}
+  </div>
+
+  <div class="card">
+    <div class="section-title">KPIs principais</div>
+    <div class="section-help">Verde = no ritmo (≥90% da meta semanal). Amarelo = atenção (70–89%). Vermelho = crítico (&lt;70%).</div>
+    <div class="grid g4">${kpiCards}</div>
+  </div>
+
+  ${historySection()}
+  `;
+};
+
+const ALL_ENTRY_FIELDS = [...STAGES, ...EXTRA_KPI_FIELDS];
+
+// Checks a single week's entry for blank fields — this is what powers the "missing data" warnings.
+function weekCompleteness(entry){
+  if(!entry) return {missing: [], total: ALL_ENTRY_FIELDS.length, isComplete: true};
+  const missing = ALL_ENTRY_FIELDS.filter(f => entry[f.key]===null || entry[f.key]===undefined);
+  return {missing, total: ALL_ENTRY_FIELDS.length, isComplete: missing.length===0};
+}
+
+function missingDataBanner(entry){
+  if(!entry){
+    return `<div class="data-alert warn">
+      <div><b>⚠ Nenhuma semana preenchida ainda.</b> O sistema não tem nenhum dado — funil, KPIs e IA ficam vazios até você salvar a primeira semana ou importar um CSV.</div>
+    </div>`;
+  }
+  const c = weekCompleteness(entry);
+  if(c.isComplete) return "";
+  return `<div class="data-alert warn">
+    <div><b>⚠ Dados incompletos na semana "${esc(entry.weekLabel||"sem rótulo")}".</b> Faltam ${c.missing.length} de ${c.total} campos: ${c.missing.map(f=>esc(f.label)).join(", ")}. Esses campos aparecem como "—" no funil e podem distorcer os cálculos de conversão, correlação e a análise da IA.</div>
+  </div>`;
+}
+
+function historySection(){
+  const entries = state.entries;
+  if(!entries.length) return "";
+  const CHART_CAP = 104; // ~2 years of weekly data, so the SVG stays readable even with 5+ years imported
+  const chartEntries = entries.length > CHART_CAP ? entries.slice(entries.length - CHART_CAP) : entries;
+  const hist = historicalStats();
+
+  const trendRows = ["loans","leads","revenue"].map(key=>{
+    const f = [...STAGES, ...EXTRA_KPI_FIELDS].find(x=>x.key===key);
+    const trend = hist ? hist.trendPct[key] : null;
+    return `
+    <div style="margin-bottom:18px;">
+      <div class="flex-between" style="margin-bottom:6px;">
+        <div class="section-title" style="margin:0;">${trm(f.label)} ao longo do tempo</div>
+        <span class="badge ${trend===null?'yellow':trend>=0?'green':'red'}"><span class="d"></span>${trend===null?'sem tendência':(trend>=0?'+':'')+trend.toFixed(1)+'% (1ª vs 2ª metade do histórico)'}</span>
+      </div>
+      ${trendChartSvg(chartEntries, key, f.label)}
+    </div>`;
+  }).join("");
+
+  const incompleteCount = entries.filter(r=>!weekCompleteness(r).isComplete).length;
+
+  const rows = entries.slice().reverse().map(r=>{
+    const c = weekCompleteness(r);
+    const statusBadge = c.isComplete
+      ? `<span class="badge green"><span class="d"></span>Completa</span>`
+      : `<span class="badge red"><span class="d"></span>Faltam ${c.missing.length}</span>`;
+    return `
+    <tr>
+      <td>${esc(r.weekLabel||"—")}</td>
+      <td>${fmtNum(r.leads)}</td>
+      <td>${fmtNum(r.appointments)}</td>
+      <td>${fmtNum(r.loans)}</td>
+      <td>${fmtMoney(r.revenue)}</td>
+      <td title="${c.isComplete?'':esc(c.missing.map(f=>f.label).join(', '))}">${statusBadge}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn ghost small" data-edit-entry="${r.id}">Editar</button>
+        <button class="btn ghost small" data-del-entry="${r.id}">Excluir</button>
+      </td>
+    </tr>
+  `;}).join("");
+
+  return `
+  <div class="card">
+    <div class="section-title">Tendência histórica</div>
+    <div class="section-help">${entries.length} semana(s) registradas no total${entries.length>CHART_CAP?` — gráfico mostrando as últimas ${CHART_CAP}`:''}. Isso é o que transforma 5 anos de planilhas em direção estratégica: onde a empresa vinha, e para onde está indo.</div>
+    <div class="hr"></div>
+    ${trendRows}
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Histórico completo (${entries.length} semanas)</div>
+        <div class="section-help">Clique em Editar para carregar uma semana antiga no formulário acima, ou Excluir para remover um registro. ${incompleteCount>0?`<span style="color:var(--red);font-weight:600;">${incompleteCount} semana(s) com dados incompletos</span> — passe o mouse no status para ver quais campos faltam.`:'Todas as semanas estão com os 13 campos preenchidos.'}</div>
+      </div>
+      ${formSourceId ? "" : `<button class="btn secondary small" id="btn-new-week">+ Nova semana em branco</button>`}
+    </div>
+    <div class="hr"></div>
+    <div style="max-height:420px;overflow-y:auto;overflow-x:auto;">
+      <table style="min-width:560px;">
+        <thead><tr><th>Semana</th><th>Leads</th><th>Appointments</th><th>Loans</th><th>Revenue</th><th>Status</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>
+  `;
+}
+
+function badge(h){
+  if(!h) return "";
+  return `<span class="badge ${h}"><span class="d"></span>${healthLabel(h)}</span>`;
+}
+
+/* ============================= RULE-BASED ACTION PLAN ============================= */
+
+const STAGE_ACTIONS = {
+  leadToQualified: [
+    {title:"Implementar critérios de qualificação (BANT) na triagem inicial de leads", impact:"+8% conversão"},
+    {title:"Treinar SDRs em script de qualificação por telefone", impact:"+5% conversão"},
+  ],
+  qualifiedToAppt: [
+    {title:"Reduzir tempo de resposta ao lead qualificado para menos de 5 minutos", impact:"+12 loans"},
+    {title:"Automatizar agendamento com link de calendário no primeiro contato", impact:"+6% conversão"},
+  ],
+  apptToApp: [
+    {title:"Padronizar roteiro da primeira reunião com checklist de aplicação", impact:"+10% conversão"},
+    {title:"Enviar pré-checklist de documentos antes do appointment", impact:"+7% conversão"},
+  ],
+  appToPreApproval: [
+    {title:"Revisar critérios de underwriting com loan officers semanalmente", impact:"+9% conversão"},
+    {title:"Criar SLA de 48h para retorno de pré-aprovação", impact:"+5% conversão"},
+  ],
+  preApprovalToCTC: [
+    {title:"Criar acompanhamento proativo semanal de cada arquivo pré-aprovado", impact:"+8% conversão"},
+    {title:"Centralizar comunicação com realtors em um único canal", impact:"+4% conversão"},
+  ],
+  ctcToLoan: [
+    {title:"Eliminar gargalos de fechamento com checklist final 72h antes", impact:"+6% conversão"},
+    {title:"Criar plano de contingência para atrasos de terceiros (título, seguro)", impact:"+4% conversão"},
+  ],
+};
+
+function ruleBasedActionPlan(){
+  const e = latestEntry();
+  if(!e) return [];
+  const actual = actualConversionRates(e);
+  const gaps = STAGES.filter(s=>s.rateKey).map(s=>{
+    const a = actual[s.rateKey];
+    const target = state.rates[s.rateKey];
+    const gap = (a===null||a===undefined) ? -999 : (target - a);
+    return {stage:s, gap};
+  }).sort((a,b)=>b.gap-a.gap);
+
+  const out = [];
+  gaps.forEach((g,i)=>{
+    if(out.length>=10) return;
+    const actions = STAGE_ACTIONS[g.stage.rateKey] || [];
+    actions.forEach((a,j)=>{
+      if(out.length>=10) return;
+      out.push({
+        id:uid(), title:a.title, impact:a.impact,
+        responsible:"Equipe de Crescimento", deadline: j===0?"15 dias":"30 dias", status:"Não iniciado"
+      });
+    });
+  });
+  return out;
+}
+
+function parseJSONLoose(text){
+  let t = text.trim();
+  t = t.replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  const start = t.indexOf('[') !== -1 && (t.indexOf('{') === -1 || t.indexOf('[') < t.indexOf('{')) ? t.indexOf('[') : t.indexOf('{');
+  const end = Math.max(t.lastIndexOf(']'), t.lastIndexOf('}'));
+  if(start !== -1 && end !== -1) t = t.slice(start, end+1);
+  return JSON.parse(t);
+}
+
+/* ============================= 10. KNOWLEDGE BASE ============================= */
+
+function knowledgeFeed(){
+  const items = [];
+  state.sops.forEach(s=>items.push({source:"SOP Library", tag:s.category, title:s.title, body:s.content, date:null}));
+  state.experiments.forEach(e=>{ if(e.learning) items.push({source:"Experiments", tag:e.decision||"Aprendizado", title:e.hypothesis, body:e.learning, date:null}); });
+  state.meetings.forEach(m=>{ if(m.decisions) items.push({source:"Meeting Assistant", tag:"Decisões", title:m.title, body:m.decisions, date:m.date}); });
+  state.coachHistory.forEach(c=>items.push({source:"AI Weekly Coach", tag:"Resumo semanal", title:c.date, body:c.text, date:c.date}));
+  if(state.aiAnalysis) items.push({source:"AI Growth Analysis", tag:"Análise", title:state.aiAnalysisDate, body:state.aiAnalysis, date:state.aiAnalysisDate});
+  state.kbNotes.forEach(n=>items.push({source:"Nota manual", tag:n.tag||"Nota", title:n.title, body:n.content, date:null}));
+  return items;
+}
+
+let kbSearch = "";
+
+function kbItemsHtml(){
+  const feed = knowledgeFeed();
+  const q = kbSearch.trim().toLowerCase();
+  const filtered = q ? feed.filter(i=> (i.title||"").toLowerCase().includes(q) || (i.body||"").toLowerCase().includes(q) || (i.source||"").toLowerCase().includes(q)) : feed;
+  return filtered.map(i=>`
+    <div class="ai-block">
+      <h4>${esc(i.source)} ${i.tag?`<span class="tag" style="margin-left:6px;">${esc(i.tag)}</span>`:''}</h4>
+      <div style="font-weight:600;font-size:13px;margin-bottom:4px;">${esc(i.title||"Sem título")}</div>
+      <div class="txt">${esc(i.body||"")}</div>
+    </div>
+  `).join("") || `<div class="empty">Nada encontrado.</div>`;
+}
+
+RENDERERS["knowledge"] = function(){
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 10</div>
+    <div class="page-title">${trm("Knowledge Base")}</div>
+    <div class="page-sub">Toda decisão, aprendizado e processo registrado nos outros módulos alimenta automaticamente esta base — pesquisável em um só lugar.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Nada obrigatório — esta base é alimentada automaticamente. Notas manuais são opcionais."],
+    ["Como preencher","Use a busca para encontrar qualquer decisão, SOP ou aprendizado já registrado no sistema."],
+    ["Por que preencher","Conhecimento disperso em 10 módulos é inútil se ninguém consegue encontrá-lo depois."],
+    ["Quais decisões tomar","Se a mesma pergunta aparece 2x na busca sem resposta clara, documente um SOP novo."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div style="flex:1;"><input type="text" id="kb-search" placeholder="Buscar em toda a base de conhecimento..." value="${esc(kbSearch)}"></div>
+      <button class="btn secondary" id="btn-add-note" style="margin-left:12px;">+ Nota manual</button>
+      ${!isComplete('knowledge') ? `<button class="btn" id="btn-conclude-kb" style="margin-left:8px;">Concluir tour</button>` : ""}
+    </div>
+  </div>
+
+  <div id="kb-items">${kbItemsHtml()}</div>
+  `;
+};
+
+/* ============================= 9. SOP LIBRARY ============================= */
+
+const SOP_CATEGORIES = ["SOP","Playbook","Script","Processo","Treinamento"];
+
+RENDERERS["sop"] = function(){
+  const filtered = state.sops.filter(s=> sopFilter==="Todos" || s.category===sopFilter);
+
+  const pills = ["Todos", ...SOP_CATEGORIES].map(c=>`<div class="p ${sopFilter===c?'active':''}" data-sop-filter="${c}">${c==="Todos"?c:trm(c)}</div>`).join("");
+
+  const cards = filtered.map(s=>`
+    <div class="card" data-sop-id="${s.id}">
+      <div class="flex-between">
+        <div style="flex:1;">
+          <span class="tag">${trm(s.category)}</span>
+          <input type="text" data-field="title" value="${esc(s.title)}" style="font-weight:600;font-size:14px;border:none;padding:4px 0;background:transparent;width:70%;">
+        </div>
+        <button class="btn ghost small" data-del-sop="${s.id}">Remover</button>
+      </div>
+      <textarea data-field="content" placeholder="Conteúdo do SOP, playbook, script ou processo...">${esc(s.content)}</textarea>
+    </div>
+  `).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 9</div>
+    <div class="page-title">${trm("SOP Library")}</div>
+    <div class="page-sub">Onde vivem os processos documentados: SOPs, playbooks, scripts e treinamentos — a memória operacional da empresa.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Título, categoria e o conteúdo do processo, script ou playbook."],
+    ["Como preencher","Um item por processo. Seja específico o suficiente para um novo funcionário seguir sem ajuda."],
+    ["Por que preencher","Processo não documentado depende de uma pessoa — processo documentado escala."],
+    ["Quais decisões tomar","Todo processo repetido 3+ vezes sem SOP deveria virar um item aqui esta semana."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div><div class="section-title">Biblioteca</div></div>
+      <button class="btn" id="btn-add-sop">+ Novo item</button>
+    </div>
+    <div class="hr"></div>
+    <div class="pill-nav">${pills}</div>
+  </div>
+  ${cards || `<div class="empty">Nenhum item nesta categoria ainda.</div>`}
+  `;
+};
+
+/* ============================= 8. EXPERIMENTS ============================= */
+
+RENDERERS["experiments"] = function(){
+  const rows = state.experiments;
+  const rowsHtml = rows.map(r=>`
+    <tr data-exp-id="${r.id}">
+      <td><textarea data-field="hypothesis" rows="2" style="min-height:44px;">${esc(r.hypothesis)}</textarea></td>
+      <td><textarea data-field="objective" rows="2" style="min-height:44px;">${esc(r.objective)}</textarea></td>
+      <td><input type="text" data-field="expected" value="${esc(r.expected)}"></td>
+      <td><input type="text" data-field="actual" value="${esc(r.actual)}"></td>
+      <td><textarea data-field="learning" rows="2" style="min-height:44px;">${esc(r.learning)}</textarea></td>
+      <td><select data-field="decision"><option ${r.decision==='Escalar'?'selected':''}>Escalar</option><option ${r.decision==='Iterar'?'selected':''}>Iterar</option><option ${r.decision==='Abandonar'?'selected':''}>Abandonar</option><option ${!r.decision?'selected':''} value="">—</option></select></td>
+      <td><button class="btn ghost small" data-del-exp="${r.id}">Remover</button></td>
+    </tr>
+  `).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 8</div>
+    <div class="page-title">${trm("Experiments")}</div>
+    <div class="page-sub">O backlog de testes: toda hipótese registrada, medida e decidida — nada fica só no "achismo".</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Hipótese testável, objetivo, resultado esperado e (depois) o resultado real."],
+    ["Como preencher","Uma linha por experimento. Preencha resultado e aprendizado só depois de rodar o teste."],
+    ["Por que preencher","Sem registro, a empresa repete os mesmos testes falhos a cada trimestre."],
+    ["Quais decisões tomar","Escalar o que funcionou, iterar o que foi promissor, abandonar o que não moveu o KPI."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div><div class="section-title">Backlog de experimentos</div></div>
+      <button class="btn" id="btn-add-exp">+ Novo experimento</button>
+    </div>
+    <div class="hr"></div>
+    ${rows.length ? `<div style="overflow-x:auto;"><table style="min-width:720px;"><thead><tr><th>Hipótese</th><th>Objetivo</th><th>Result. esperado</th><th>Result. real</th><th>Aprendizado</th><th>Decisão</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table></div>` : `<div class="empty">Nenhum experimento ainda.</div>`}
+  </div>
+  `;
+};
+
+/* ============================= 7. MEETING ASSISTANT ============================= */
+
+RENDERERS["meetings"] = function(){
+  const meetings = state.meetings.slice().reverse();
+
+  const list = meetings.map(m=>`
+    <div class="card" data-meeting-id="${m.id}">
+      <div class="flex-between">
+        <div>
+          <div class="section-title">${esc(m.title||"Reunião")} <span class="muted small">— ${esc(m.date)}</span></div>
+        </div>
+        <button class="btn ghost small" data-del-meeting="${m.id}">Remover</button>
+      </div>
+      ${m.summary ? `
+        <div class="ai-block"><h4>Resumo</h4><div class="txt">${esc(m.summary)}</div></div>
+        <div class="grid g2">
+          <div class="ai-block"><h4>Decisões</h4><div class="txt">${esc(m.decisions)}</div></div>
+          <div class="ai-block"><h4>Responsáveis</h4><div class="txt">${esc(m.responsible)}</div></div>
+          <div class="ai-block"><h4>Pendências</h4><div class="txt">${esc(m.pending)}</div></div>
+          <div class="ai-block"><h4>Próximos passos</h4><div class="txt">${esc(m.nextSteps)}</div></div>
+        </div>
+      ` : `<div class="empty small">Notas brutas salvas. Gere o resumo estruturado abaixo.</div>`}
+    </div>
+  `).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 7</div>
+    <div class="page-title">${trm("Meeting Assistant")}</div>
+    <div class="page-sub">Cole as notas brutas da reunião e a IA extrai resumo, decisões, responsáveis, pendências e próximos passos.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Título, data e as notas ou transcrição bruta da reunião."],
+    ["Como preencher","Cole o texto como veio — a IA organiza a estrutura para você."],
+    ["Por que preencher","Reuniões sem registro estruturado viram decisões esquecidas em duas semanas."],
+    ["Quais decisões tomar","Toda pendência gerada aqui deveria virar uma linha no Weekly Scorecard ou Action Plan."],
+  ])}
+
+  <div class="card">
+    <div class="section-title">Nova reunião</div>
+    <div class="hr"></div>
+    <div class="grid g2">
+      <div class="field"><label class="field-label">Título</label><input type="text" id="meeting-title" placeholder="Ex: Sync semanal de vendas"></div>
+      <div class="field"><label class="field-label">Data</label><input type="date" id="meeting-date" value="${new Date().toISOString().slice(0,10)}"></div>
+    </div>
+    <div class="field"><label class="field-label">Notas brutas / transcrição</label><textarea id="meeting-notes" placeholder="Cole aqui as notas ou a transcrição da reunião..."></textarea></div>
+    <button class="btn" id="btn-gen-meeting">Gerar resumo com IA</button>
+  </div>
+
+  ${list || `<div class="empty">Nenhuma reunião registrada ainda.</div>`}
+  `;
+};
+
+/* ============================= 6. AI WEEKLY COACH ============================= */
+
+RENDERERS["weekly-coach"] = function(){
+  const e = latestEntry();
+  const history = state.coachHistory.slice().reverse();
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 6</div>
+    <div class="page-title">${trm("AI Weekly Coach")}</div>
+    <div class="page-sub">Um resumo executivo automático toda semana: o que aconteceu, o que melhorou, o que piorou e o plano da próxima semana.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Nada — este módulo lê os dados já salvos no Executive Dashboard."],
+    ["Como preencher","Preencha a semana no Dashboard, depois clique em Gerar Weekly Coach aqui."],
+    ["Por que preencher","Transforma números soltos em uma narrativa que qualquer stakeholder entende em 60 segundos."],
+    ["Quais decisões tomar","Use 'Plano da próxima semana' como pauta da reunião semanal com o time."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Gerar coach desta semana</div>
+        <div class="section-help">${e? "Semana atual: "+esc(e.weekLabel||"sem rótulo") : "Preencha uma semana no Dashboard primeiro."}</div>
+      </div>
+      <button class="btn" id="btn-gen-coach" ${!e?'disabled':''}>Gerar Weekly Coach</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Histórico</div>
+    <div class="section-help">Mais recente primeiro.</div>
+    <div class="hr"></div>
+    ${history.length? history.map(h=>`
+      <div class="ai-block">
+        <h4>${esc(h.date)}</h4>
+        <div class="txt">${esc(h.text)}</div>
+      </div>
+    `).join("") : `<div class="empty">Nenhum coach gerado ainda.</div>`}
+  </div>
+  `;
+};
+
+/* ============================= 5. GROWTH ACTION PLAN ============================= */
+
+RENDERERS["action-plan"] = function(){
+  const plan = state.actionPlan;
+
+  const cards = plan.map((p, idx)=>`
+    <div class="priority-card" data-plan-id="${p.id}">
+      <div class="num">${idx+1}</div>
+      <div>
+        <input type="text" data-field="title" value="${esc(p.title)}" style="font-weight:600;font-size:13.5px;border:none;padding:2px 0;background:transparent;">
+        <div class="meta">
+          Responsável: <input type="text" data-field="responsible" value="${esc(p.responsible)}" style="display:inline;width:110px;border:1px solid var(--line);padding:3px 6px;font-size:11.5px;border-radius:6px;">
+          &nbsp;•&nbsp; Prazo: <input type="text" data-field="deadline" value="${esc(p.deadline)}" style="display:inline;width:90px;border:1px solid var(--line);padding:3px 6px;font-size:11.5px;border-radius:6px;">
+          &nbsp;•&nbsp; Status:
+          <select data-field="status" style="display:inline;width:auto;padding:3px 6px;font-size:11.5px;border-radius:6px;">
+            ${["Não iniciado","Em andamento","Concluído","Bloqueado"].map(o=>`<option ${p.status===o?'selected':''}>${o}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="impact ${!/^[+-]?\d/.test(p.impact||'')?'neutral':''}">${esc(p.impact||'—')}</div>
+        <div class="meta">impacto esperado</div>
+        <button class="btn ghost small" data-del-plan="${p.id}">Remover</button>
+      </div>
+    </div>
+  `).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 5</div>
+    <div class="page-title">${trm("Growth Action Plan")}</div>
+    <div class="page-sub">As até 10 prioridades que mais movem o ponteiro, ordenadas por impacto — não por urgência.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Título da ação, responsável, prazo e status — o impacto esperado é sugerido pela IA."],
+    ["Como preencher","Gere automaticamente a partir do gargalo identificado, depois ajuste responsável e prazo."],
+    ["Por que preencher","Um plano sem dono e sem prazo é apenas uma lista de desejos."],
+    ["Quais decisões tomar","Execute a prioridade #1 até o fim antes de começar a #3 — foco sequencial bate paralelismo disperso."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Plano de ação (até 10 prioridades)</div>
+        <div class="section-help">Gerado a partir da análise de gargalo — editável a qualquer momento.</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn secondary" id="btn-gen-plan-rules">Sugestão rápida</button>
+        <button class="btn" id="btn-gen-plan-ai" ${!latestEntry()?'disabled':''}>Gerar Plano com IA</button>
+      </div>
+    </div>
+    <div class="hr"></div>
+    ${plan.length ? cards : `<div class="empty">Nenhuma prioridade ainda. Use <b>Sugestão rápida</b> ou <b>Gerar Plano com IA</b>.</div>`}
+    ${plan.length && plan.length<10 ? `<button class="btn secondary small" id="btn-add-plan">+ Adicionar prioridade</button>` : ""}
+  </div>
+  `;
+};
+
+/* ============================= 4. WEEKLY SCORECARD ============================= */
+
+RENDERERS["scorecard"] = function(){
+  const rows = state.scorecard;
+  const statusOptions = ["No prazo","Atenção","Atrasado","Concluído"];
+
+  const rowsHtml = rows.map(r=>`
+    <tr data-row-id="${r.id}">
+      <td><input type="text" data-field="kpi" value="${esc(r.kpi)}"></td>
+      <td><input type="number" data-field="meta" value="${r.meta??''}" style="width:80px;"></td>
+      <td><input type="number" data-field="resultado" value="${r.resultado??''}" style="width:80px;"></td>
+      <td>${gapCell(r)}</td>
+      <td><input type="number" data-field="prioridade" value="${r.prioridade??''}" style="width:56px;" min="1" max="10"></td>
+      <td><input type="text" data-field="responsavel" value="${esc(r.responsavel)}" style="width:110px;"></td>
+      <td><select data-field="status">${statusOptions.map(o=>`<option ${r.status===o?'selected':''}>${o}</option>`).join("")}</select></td>
+      <td><input type="text" data-field="comentarios" value="${esc(r.comentarios)}" placeholder="—"></td>
+      <td><button class="btn ghost small" data-del-row="${r.id}">Remover</button></td>
+    </tr>
+  `).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 4</div>
+    <div class="page-title">${trm("Weekly Scorecard")}</div>
+    <div class="page-sub">O ritual semanal de prestação de contas: meta, resultado, gap, responsável e status — tudo em uma linha por KPI.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Meta, resultado real, responsável e status de cada KPI que a liderança acompanha."],
+    ["Como preencher","Use 'Gerar da semana atual' para popular automaticamente com base no Dashboard e Reverse Engineering."],
+    ["Por que preencher","Isso vira o roteiro da reunião semanal — ninguém discute prioridade sem antes ver o gap."],
+    ["Quais decisões tomar","Ordene por gap: onde estamos mais longe da meta é onde a atenção da liderança deve ir primeiro."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Scorecard da semana</div>
+        <div class="section-help">Edite diretamente na tabela. Alterações salvam automaticamente.</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn secondary" id="btn-gen-scorecard">Gerar da semana atual</button>
+        <button class="btn" id="btn-add-row">+ Adicionar linha</button>
+      </div>
+    </div>
+    <div class="hr"></div>
+    ${rows.length ? `
+    <div style="overflow-x:auto;">
+    <table style="min-width:820px;">
+      <thead><tr><th>KPI</th><th>Meta</th><th>Resultado</th><th>Gap</th><th>Prior.</th><th>Responsável</th><th>Status</th><th>Comentários</th><th></th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    </div>` : `<div class="empty">Nenhuma linha ainda. Clique em <b>Gerar da semana atual</b> para começar.</div>`}
+  </div>
+  `;
+};
+
+function gapCell(r){
+  if(r.meta===undefined||r.meta===null||r.meta===""||r.resultado===undefined||r.resultado===null||r.resultado==="") return `<span class="muted small">—</span>`;
+  const gap = r.resultado - r.meta;
+  const h = health(r.resultado, r.meta);
+  return `<span class="badge ${h}"><span class="d"></span>${gap>=0?'+':''}${Math.round(gap)}</span>`;
+}
+
+/* ============================= 3. REVERSE ENGINEERING ============================= */
+
+RENDERERS["reverse-eng"] = function(){
+  const rates = state.rates;
+  const targets = reverseTargets(state.meta.targetLoans, rates);
+  const weekly = weeklyOf(targets);
+
+  const chain = STAGES.slice().reverse().map(s=>{
+    const monthly = targets[s.key];
+    const wk = weekly[s.key];
+    return `<div class="funnel-row" style="grid-template-columns:170px 1fr 130px;">
+      <div class="stage-name">${trm(s.label)}</div>
+      <div class="funnel-bar-track"><div class="funnel-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--navy-soft),var(--navy));"><span>${Math.round(monthly)} / mês</span></div></div>
+      <div class="funnel-conv">${Math.round(wk)} / semana</div>
+    </div>`;
+  }).join("");
+
+  const rateInputs = STAGES.filter(s=>s.rateKey).map(s=>`
+    <div class="field">
+      <label class="field-label">${trmRate(s.rateLabel)} (%)</label>
+      <input type="number" min="0" max="100" id="rate-${s.rateKey}" value="${rates[s.rateKey]}">
+    </div>`).join("");
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 3</div>
+    <div class="page-title">${trm("Reverse Engineering")}</div>
+    <div class="page-sub">Parta da meta de loans e descubra, matematicamente, quantos leads, agendamentos e aprovações são necessários em cada etapa.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","A meta de loans/mês e as taxas de conversão entre cada etapa do funil."],
+    ["Como preencher","Use as taxas reais da sua operação (veja em AI Growth Analysis) ou comece com os padrões do setor."],
+    ["Por que preencher","Sem isso você não sabe quantos leads gerar — só sabe o resultado final desejado."],
+    ["Quais decisões tomar","Se o número de leads necessários for inviável, o gargalo está nas taxas de conversão, não no topo do funil."],
+  ])}
+
+  <div class="card">
+    <div class="section-title">Meta e taxas de conversão</div>
+    <div class="section-help">Estes valores recalculam automaticamente todos os alvos abaixo.</div>
+    <div class="hr"></div>
+    <div class="grid g3">
+      <div class="field">
+        <label class="field-label">Meta de loans / mês</label>
+        <input type="number" min="1" id="target-loans" value="${state.meta.targetLoans}">
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:6px;">
+      ${rateInputs}
+    </div>
+    <button class="btn secondary small" id="btn-reset-rates" style="margin-top:6px;">Restaurar taxas padrão</button>
+    <button class="btn small" id="btn-confirm-rates" style="margin-top:6px;margin-left:8px;">Confirmar configuração</button>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Para fechar ${state.meta.targetLoans} loans por mês, você precisa de:</div>
+    <div class="section-help">Cálculo automático, do fim do funil para o início.</div>
+    <div class="hr"></div>
+    ${chain}
+  </div>
+  `;
+};
+
+/* ============================= 2. AI GROWTH ANALYSIS ============================= */
+
+function statisticalDiagnosticsCard(){
+  const entries = state.entries;
+  if(entries.length < 5){
+    return `<div class="card">
+      <div class="section-title">Diagnóstico estatístico</div>
+      <div class="section-help">Correlação e projeção precisam de pelo menos 5 semanas de histórico para ter significado estatístico.</div>
+      <div class="hr"></div>
+      <div class="empty">Você tem ${entries.length} semana(s) registrada(s). Importe mais histórico (CSV) ou continue preenchendo semanalmente — a partir de 5 semanas este painel calcula automaticamente.</div>
+    </div>`;
+  }
+
+  const drivers = driverAnalysis();
+  const forecast = loansForecast();
+
+  const driverRows = (drivers||[]).slice(0,8).map(d=>{
+    const strength = corrStrength(d.r);
+    const badgeClass = strength==="forte" ? (d.r>=0?"green":"red") : strength==="moderada" ? "yellow" : "yellow";
+    const barWidth = Math.min(100, Math.abs(d.r)*100);
+    return `<tr>
+      <td>${esc(d.label)}</td>
+      <td style="width:200px;">
+        <div style="background:#F0F2F5;border-radius:6px;height:10px;overflow:hidden;">
+          <div style="width:${barWidth}%;height:100%;background:${d.r>=0?'var(--green)':'var(--red)'};"></div>
+        </div>
+      </td>
+      <td class="mono" style="text-align:right;">${d.r>=0?'+':''}${d.r.toFixed(2)}</td>
+      <td><span class="badge ${badgeClass}"><span class="d"></span>${strength}</span></td>
+    </tr>`;
+  }).join("");
+
+  const forecastBlock = forecast ? `
+    <div class="grid g3" style="margin-top:14px;">
+      <div class="kpi-card">
+        <div class="label">Tendência de Loans</div>
+        <div class="value" style="font-size:17px;">${forecast.direction==='subindo'?'&#8599; Subindo':forecast.direction==='caindo'?'&#8600; Caindo':'&#8594; Estável'}</div>
+        <div class="foot">${forecast.slopePerWeek>=0?'+':''}${forecast.slopePerWeek.toFixed(2)} loans/semana</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Projeção próxima semana</div>
+        <div class="value">${forecast.projectedNextWeek.toFixed(1)}</div>
+        <div class="foot">ritmo mensal projetado: ${Math.round(forecast.projectedMonthlyPace)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Semanas até bater a meta</div>
+        <div class="value">${forecast.weeksToTarget!==null ? (forecast.weeksToTarget > 104 ? '>104' : forecast.weeksToTarget) : '—'}</div>
+        <div class="foot">${forecast.weeksToTarget===null ? 'tendência não converge — ação necessária' : forecast.weeksToTarget > 104 ? `no ritmo atual, mais de 2 anos (${forecast.weeksToTarget} semanas) — ritmo insuficiente, não espere a tendência sozinha` : 'no ritmo de melhora atual'}</div>
+      </div>
+    </div>
+  ` : "";
+
+  return `
+  <div class="card">
+    <div class="section-title">Diagnóstico estatístico</div>
+    <div class="section-help">Correlação de cada KPI com Loans fechados, calculada sobre as ${entries.length} semanas do histórico completo — isto é o que realmente move o resultado, não achismo. Correlação não é causalidade: use como ponto de partida para investigar, não como conclusão definitiva.</div>
+    <div class="hr"></div>
+    ${driverRows ? `<div style="overflow-x:auto;"><table style="min-width:520px;"><thead><tr><th>KPI</th><th>Correlação com Loans</th><th style="text-align:right;">r</th><th>Força</th></tr></thead><tbody>${driverRows}</tbody></table></div>` : `<div class="empty">Dados insuficientes para calcular correlações.</div>`}
+    ${forecastBlock}
+  </div>`;
+}
+
+RENDERERS["ai-analysis"] = function(){
+  const e = latestEntry();
+  const bottleneck = e ? findBottleneck(e, state.rates) : null;
+
+  const questions = [
+    "Qual é o maior gargalo da empresa?",
+    "Onde estamos perdendo clientes?",
+    "Qual KPI merece prioridade?",
+    "Qual ação gera maior impacto?",
+    "O que NÃO devemos fazer?",
+    "Quais riscos existem?",
+    "Quais oportunidades existem?",
+  ];
+
+  return `
+  <div class="page-head">
+    <div class="page-eyebrow">Módulo 2</div>
+    <div class="page-title">${trm("AI Growth Analysis")}</div>
+    <div class="page-sub">Depois de preencher os números da semana, gere uma análise que responde às 7 perguntas que todo CEO precisa responder.</div>
+  </div>
+
+  ${explainBox([
+    ["O que preencher","Nada aqui — este módulo lê os dados já preenchidos no Executive Dashboard."],
+    ["Como preencher","Vá ao Dashboard primeiro, salve a semana, depois volte e clique em Gerar Análise."],
+    ["Por que preencher","A IA cruza taxas de conversão reais vs. metas para achar o gargalo com maior impacto financeiro."],
+    ["Quais decisões tomar","Ataque o gargalo #1 antes de qualquer outra iniciativa — é onde o dinheiro está sendo perdido."],
+  ])}
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Diagnóstico instantâneo (baseado em regras)</div>
+        <div class="section-help">Cálculo automático comparando conversão real vs. meta configurada.</div>
+      </div>
+    </div>
+    <div class="hr"></div>
+    ${e && bottleneck ? `
+      <div class="ai-block">
+        <h4>Maior gargalo identificado</h4>
+        <div class="txt"><b>${trm(bottleneck.stage.label)}</b> — conversão real de <b>${bottleneck.stage.rateKey?bottleneck.actual.toFixed(1):''}%</b> vs. meta de <b>${bottleneck.target}%</b> (gap de ${bottleneck.gap.toFixed(1)} pontos percentuais).
+Se essa etapa atingir a meta configurada, o volume de loans no final do funil aumenta proporcionalmente — priorize esta etapa primeiro.</div>
+      </div>
+    ` : `<div class="empty">Preencha os dados semanais no Executive Dashboard para calcular o gargalo.</div>`}
+  </div>
+
+  ${statisticalDiagnosticsCard()}
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Análise estratégica com IA</div>
+        <div class="section-help">Gera uma resposta completa às 7 perguntas de crescimento, no estilo de uma consultoria estratégica — já considerando as correlações e a projeção acima.</div>
+      </div>
+      <button class="btn" id="btn-gen-analysis" ${!e?'disabled':''}>Gerar Análise com IA</button>
+    </div>
+    <div class="hr"></div>
+    <div style="margin-bottom:14px;">
+      ${questions.map((q,i)=>`<span class="tag">${i+1}. ${q}</span>`).join(" ")}
+    </div>
+    <div id="analysis-output">
+      ${state.aiAnalysis ? `<div class="ai-block"><h4>Última análise — ${state.aiAnalysisDate}</h4><div class="txt">${esc(state.aiAnalysis)}</div></div>` : `<div class="empty">Nenhuma análise gerada ainda. Clique em <b>Gerar Análise com IA</b>.</div>`}
+    </div>
+  </div>
+  `;
+};
+
+function explainBox(items){
+  return `<div class="explain">${items.map(([h,b])=>`<div class="item"><div class="h">${h}</div><div class="b">${b}</div></div>`).join("")}</div>`;
+}
+
+/* ============================= GUIDED SEQUENCE ============================= */
+
+const PLAYBOOK_ORDER = NAV.flatMap(g=>g.items.map(i=>i.id));
+
+function stepNumber(id){ return PLAYBOOK_ORDER.indexOf(id)+1; }
+
+function stepLabel(id){
+  for(const g of NAV) for(const i of g.items) if(i.id===id) return i.label;
+  return id;
+}
+
+function isComplete(id){
+  switch(id){
+    case "dashboard": return state.entries.length >= 1;
+    case "ai-analysis": return !!state.aiAnalysis;
+    case "reverse-eng": return !!(state.progress && state.progress.reverseEng);
+    case "scorecard": return state.scorecard.length >= 1;
+    case "action-plan": return state.actionPlan.length >= 1;
+    case "weekly-coach": return state.coachHistory.length >= 1;
+    case "meetings": return state.meetings.length >= 1;
+    case "experiments": return state.experiments.length >= 1;
+    case "sop": return state.sops.length >= 1;
+    case "knowledge": return !!(state.progress && state.progress.knowledge);
+    default: return false;
+  }
+}
+
+const PENDING_NOTES = {
+  "dashboard": "Preencha os 13 campos da semana no formulário acima e clique em <b>Salvar semana</b>.",
+  "ai-analysis": "Clique em <b>Gerar Análise com IA</b> para identificar o gargalo e responder as 7 perguntas estratégicas.",
+  "reverse-eng": "Confira a meta mensal e as taxas de conversão, ajuste se necessário, e clique em <b>Confirmar configuração</b> abaixo.",
+  "scorecard": "Clique em <b>Gerar da semana atual</b> para montar o scorecard automaticamente a partir do Dashboard.",
+  "action-plan": "Clique em <b>Sugestão rápida</b> ou <b>Gerar Plano com IA</b> para criar suas prioridades.",
+  "weekly-coach": "Clique em <b>Gerar Weekly Coach</b> para criar o resumo executivo da semana.",
+  "meetings": "Registre pelo menos uma reunião: cole as notas e clique em <b>Gerar resumo com IA</b>.",
+  "experiments": "Adicione pelo menos um experimento com hipótese e objetivo definidos.",
+  "sop": "Adicione pelo menos um SOP, playbook ou script à biblioteca.",
+  "knowledge": "Explore a busca — quando estiver confortável com o conteúdo, clique em <b>Concluir tour</b> abaixo.",
+};
+
+const COMPLETION_CRITERIA = {
+  "dashboard": "Conclui quando: você salva a primeira semana",
+  "ai-analysis": "Conclui quando: você gera a análise",
+  "reverse-eng": "Conclui quando: você clica em \"Confirmar configuração\"",
+  "scorecard": "Conclui quando: você gera o scorecard da semana",
+  "action-plan": "Conclui quando: você cria as prioridades",
+  "weekly-coach": "Conclui quando: você gera o primeiro resumo",
+  "meetings": "Conclui quando: você registra a primeira reunião",
+  "experiments": "Conclui quando: você adiciona o primeiro teste",
+  "sop": "Conclui quando: você adiciona o primeiro processo",
+  "knowledge": "Conclui quando: você clica em \"Concluir tour\"",
+};
+
+const COMPLETION_NOTES = {
+  "dashboard": "Seus números já alimentam o funil e os indicadores de saúde do Dashboard.",
+  "ai-analysis": "O gargalo já foi identificado — agora vamos transformá-lo em metas de volume.",
+  "reverse-eng": "Suas metas semanais para cada etapa do funil já estão calculadas.",
+  "scorecard": "O ritual semanal está pronto — hora de transformar gaps em ações.",
+  "action-plan": "Suas prioridades estão definidas — hora de testar e comunicar o progresso.",
+  "weekly-coach": "O resumo executivo está pronto para compartilhar com stakeholders.",
+  "meetings": "Suas decisões estão documentadas — agora registre o que está sendo testado.",
+  "experiments": "Todo aprendizado validado aqui deveria virar processo na biblioteca.",
+  "sop": "Seus processos estão documentados e já aparecem na Knowledge Base.",
+  "knowledge": "Você concluiu as 10 etapas. A partir de agora, o ciclo é semanal.",
+};
+
+function guidedBannerHtml(current){
+  const idx = PLAYBOOK_ORDER.indexOf(current);
+  const completedCount = PLAYBOOK_ORDER.filter(isComplete).length;
+  const dots = PLAYBOOK_ORDER.map((id,i)=>{
+    const done = isComplete(id);
+    const cur = id===current;
+    const cls = cur ? "cur" : (done ? "done" : "todo");
+    const inner = done ? "&#10003;" : (i+1);
+    return `<div class="gstep ${cls}" data-goto="${id}" title="${esc(stepLabel(id))} — ${esc(COMPLETION_CRITERIA[id]||'')}">${inner}</div>`;
+  }).join(`<div class="gline"></div>`);
+  return `<div class="guide-bar">
+    <div class="guide-bar-top">
+      <span>Sequência guiada — Etapa ${idx+1} de ${PLAYBOOK_ORDER.length}: ${esc(stepLabel(current))}</span>
+      <span class="muted" style="font-weight:500;">${completedCount}/${PLAYBOOK_ORDER.length} concluídas</span>
+    </div>
+    <div class="guide-dots">${dots}</div>
+  </div>`;
+}
+
+function nextStepCalloutHtml(current){
+  const idx = PLAYBOOK_ORDER.indexOf(current);
+  const done = isComplete(current);
+  const nextId = PLAYBOOK_ORDER[idx+1];
+  if(done && nextId){
+    return `<div class="next-callout done">
+      <div>&#9989; <b>Etapa ${idx+1} concluída.</b> ${COMPLETION_NOTES[current]||""}</div>
+      <button class="btn" data-goto-step="${nextId}">Ir para Etapa ${stepNumber(nextId)}: ${esc(stepLabel(nextId))} &rarr;</button>
+    </div>`;
+  }
+  if(done && !nextId){
+    return `<div class="next-callout done"><div>&#127881; <b>Etapa ${idx+1} concluída — são as 10 etapas!</b> ${COMPLETION_NOTES[current]||""}</div></div>`;
+  }
+  return `<div class="next-callout pending">
+    <div><b>Etapa ${idx+1} ainda não concluída.</b> ${PENDING_NOTES[current]||""}</div>
+  </div>`;
+}
+
+</script>
+</body>
+</html>
