@@ -701,6 +701,89 @@ function exportEntriesCSV(){
   downloadBlob(lines.join("\n"), `historico-${safeName}.csv`, "text/csv;charset=utf-8;");
 }
 
+// Builds a standalone, visually styled HTML report (executive dashboard + full blueprint text)
+// and opens it in a new tab, triggering the browser's native print dialog — the person picks
+// "Save as PDF" there. No external libraries needed, works in any browser.
+function generatePrintableReportHTML(){
+  const targets = reverseTargets(state.meta.targetLoans, state.rates);
+  const daily = dailyOf(targets), weekly = weeklyOf(targets), annual = annualOf(targets);
+  const topLO = state.loanOfficersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0))[0];
+  const topPartner = state.realtorPartnersList.slice().sort((a,b)=>(b.loansClosed||0)-(a.loansClosed||0))[0];
+  const topRisks = state.risks.slice().sort((a,b)=>{
+    const sa=(RISK_SCORE[a.probability]||0)*(RISK_SCORE[a.impact]||0), sb=(RISK_SCORE[b.probability]||0)*(RISK_SCORE[b.impact]||0);
+    return sb-sa;
+  }).slice(0,3);
+  const e = latestEntry();
+  const bottleneck = e ? findBottleneck(e, state.rates) : null;
+  const today = new Date().toLocaleDateString('pt-BR');
+
+  const cadenceRows = STAGES.slice().reverse().map(s=>`
+    <tr>
+      <td>${esc(s.label)}</td>
+      <td>${fmtNum(Math.max(1,Math.round(daily[s.key])))}</td>
+      <td>${fmtNum(Math.round(weekly[s.key]))}</td>
+      <td>${fmtNum(Math.round(targets[s.key]))}</td>
+      <td>${fmtNum(Math.round(annual[s.key]))}</td>
+    </tr>`).join("");
+
+  // Turn the AI blueprint's plain-text section titles into real headings for the printed doc.
+  const knownSections = ["Diagnóstico Atual","Meta e Engenharia Reversa","Estrutura e Pessoas","Riscos e Mitigação","Fase 1 — Primeiros 30 dias","Fase 2 — Dias 31 a 60","Fase 3 — Dias 61 a 90","Como Vamos Medir o Progresso"];
+  let blueprintHtml = "";
+  if(state.blueprint){
+    const lines = state.blueprint.split("\n");
+    blueprintHtml = lines.map(line=>{
+      const trimmed = line.trim();
+      if(knownSections.some(s=> trimmed === s || trimmed.replace(/:$/,"")===s)) return `<h3>${esc(trimmed)}</h3>`;
+      if(trimmed === "") return "";
+      return `<p>${esc(line)}</p>`;
+    }).join("");
+  }
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><title>Blueprint 30/60/90 — ${esc(state.meta.companyName)}</title>
+<style>
+  @page { margin: 22mm 16mm; }
+  body{ font-family:-apple-system,Segoe UI,Arial,sans-serif; color:#0F172A; max-width:820px; margin:0 auto; padding:24px; line-height:1.5; }
+  h1{ font-size:24px; margin-bottom:2px; }
+  .sub{ color:#64748B; font-size:13px; margin-bottom:24px; }
+  h2{ font-size:15px; text-transform:uppercase; letter-spacing:.04em; color:#0B1E3B; border-bottom:2px solid #0B1E3B; padding-bottom:6px; margin-top:30px; }
+  h3{ font-size:14px; color:#0B1E3B; margin-top:20px; margin-bottom:6px; }
+  p{ font-size:13px; margin:6px 0; }
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; margin-top:10px; }
+  th{ text-align:left; background:#F3F6FA; padding:7px 10px; font-size:11px; text-transform:uppercase; color:#64748B; }
+  td{ padding:7px 10px; border-bottom:1px solid #EEF1F5; }
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+  .card{ border:1px solid #E6E9EE; border-radius:8px; padding:12px 14px; }
+  .card .l{ font-size:10.5px; text-transform:uppercase; color:#64748B; font-weight:600; }
+  .card .v{ font-size:18px; font-weight:700; color:#0B1E3B; margin-top:2px; }
+  .card .f{ font-size:11px; color:#64748B; margin-top:2px; }
+  .risk{ font-size:13px; margin-top:6px; }
+  @media print { .no-print{ display:none; } }
+  .no-print{ text-align:center; margin-bottom:20px; }
+  .no-print button{ background:#0B1E3B; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-size:14px; cursor:pointer; }
+</style></head>
+<body>
+  <div class="no-print"><button onclick="window.print()">🖨 Salvar como PDF</button></div>
+  <h1>${esc(state.meta.companyName)}</h1>
+  <div class="sub">Blueprint 30/60/90 — gerado em ${today}</div>
+
+  <h2>Resumo Executivo</h2>
+  <div class="grid">
+    <div class="card"><div class="l">Meta mensal</div><div class="v">${state.meta.targetLoans} loans</div><div class="f">${Math.round(daily.loans)}/dia · ${Math.round(weekly.loans)}/semana · ${Math.round(annual.loans)}/ano</div></div>
+    <div class="card"><div class="l">Maior gargalo</div><div class="v" style="font-size:14px;">${bottleneck?esc(bottleneck.stage.label):'—'}</div><div class="f">${bottleneck?`gap de ${bottleneck.gap.toFixed(1)}pp vs. meta`:'sem dados ainda'}</div></div>
+    <div class="card"><div class="l">Top Loan Officer</div><div class="v" style="font-size:14px;">${topLO?esc(topLO.name||'—'):'—'}</div><div class="f">${topLO?`${topLO.loansClosed} loans fechados`:'nenhum cadastrado'}</div></div>
+    <div class="card"><div class="l">Top Realtor Partner</div><div class="v" style="font-size:14px;">${topPartner?esc(topPartner.name||'—'):'—'}</div><div class="f">${topPartner?`${topPartner.loansClosed} loans fechados`:'nenhum cadastrado'}</div></div>
+  </div>
+
+  <h2>Metas em Todos os Ritmos</h2>
+  <table><thead><tr><th>Etapa</th><th>Dia</th><th>Semana</th><th>Mês</th><th>Ano</th></tr></thead><tbody>${cadenceRows}</tbody></table>
+
+  ${topRisks.length ? `<h2>Principais Riscos</h2>${topRisks.map(r=>`<div class="risk">⚠ <b>${esc(r.title||'sem título')}</b> — probabilidade ${esc(r.probability||'—')}, impacto ${esc(r.impact||'—')}${r.mitigation?` — mitigação: ${esc(r.mitigation)}`:''}</div>`).join("")}` : ''}
+
+  ${state.blueprint ? `<h2>Business Plan Completo</h2>${blueprintHtml}` : `<h2>Business Plan Completo</h2><p style="color:#94A3B8;">Nenhum blueprint gerado com IA ainda — gere na ferramenta antes de exportar para ter o plano de execução completo aqui.</p>`}
+</body></html>`;
+}
+
 function downloadCSVTemplate(){
   const headers = ["Semana","Leads","Qualified Leads","Appointments","Applications","Pre Approvals","Clear To Close","Loans","Revenue","Marketing Spend","CAC","Response Time","Loan Officers","Realtor Partners"];
   const example = ["Semana 1","500","200","100","60","40","25","20","100000","20000","1000","10","5","10"];
@@ -1486,21 +1569,26 @@ function bindEvents(){
         const proceed = confirm(`Atenção — provável erro de digitação:\n${msgs.join("\n")}\n\nSalvar assim mesmo?`);
         if(!proceed) return;
       }
-      if(formSourceId && state.entries.some(x=>x.id===formSourceId)){
-        entry.id = formSourceId;
-        const idx = state.entries.findIndex(x=>x.id===formSourceId);
-        state.entries[idx] = entry;
-        formSourceId = null;
-      } else {
-        const existingIdx = state.entries.findIndex(e=> e.weekLabel && weekLabel && e.weekLabel.toLowerCase()===weekLabel.toLowerCase());
-        if(existingIdx !== -1){
-          entry.id = state.entries[existingIdx].id;
-          state.entries[existingIdx] = entry;
-        } else {
-          entry.id = uid();
-          state.entries.push(entry);
-        }
+      let targetId = null;
+      if(formSourceId && formSourceId !== "__blank__" && state.entries.some(x=>x.id===formSourceId)){
+        targetId = formSourceId;
+      } else if(weekStartDate){
+        const byDate = state.entries.find(e=>e.weekStartDate===weekStartDate);
+        if(byDate) targetId = byDate.id;
       }
+      if(!targetId && weekLabel){
+        const byLabel = state.entries.find(e=> e.weekLabel && e.weekLabel.toLowerCase()===weekLabel.toLowerCase());
+        if(byLabel) targetId = byLabel.id;
+      }
+      if(targetId){
+        entry.id = targetId;
+        const idx = state.entries.findIndex(x=>x.id===targetId);
+        state.entries[idx] = entry;
+      } else {
+        entry.id = uid();
+        state.entries.push(entry);
+      }
+      formSourceId = null;
       persist('entries');
       rerender();
     });
@@ -1515,7 +1603,7 @@ function bindEvents(){
     if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ formSourceId = null; rerender(); });
 
     const newWeekBtn = document.getElementById('btn-new-week');
-    if(newWeekBtn) newWeekBtn.addEventListener('click', ()=>{ formSourceId = null; rerender(); window.scrollTo(0,0); });
+    if(newWeekBtn) newWeekBtn.addEventListener('click', ()=>{ formSourceId = "__blank__"; rerender(); window.scrollTo(0,0); });
 
     main.querySelectorAll('[data-edit-entry]').forEach(b=>{
       b.addEventListener('click', ()=>{
@@ -2048,6 +2136,19 @@ function bindEvents(){
       const safeName = state.meta.companyName.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
       downloadBlob(md, `blueprint-30-60-90-${safeName}.md`, "text/markdown;charset=utf-8;");
     });
+
+    const printBtn = document.getElementById('btn-print-report');
+    if(printBtn) printBtn.addEventListener('click', ()=>{
+      const html = generatePrintableReportHTML();
+      const win = window.open('', '_blank');
+      if(!win){
+        alert("O navegador bloqueou a abertura da nova aba. Permita pop-ups para este site e tente de novo.");
+        return;
+      }
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    });
   }
 }
 
@@ -2104,7 +2205,18 @@ function trendChartSvg(entries, key, label){
 
 RENDERERS["dashboard"] = function(){
   const e = latestEntry();
-  const formEntry = formSourceId ? state.entries.find(x=>x.id===formSourceId) : null;
+  const currentWeekMonday = getMondayOf(dailyLogDate);
+  const currentWeekEntry = state.entries.find(x=>x.weekStartDate===currentWeekMonday);
+  let formEntry = null;
+  let formIsAutoFromDailyLog = false;
+  if(formSourceId === "__blank__"){
+    formEntry = null;
+  } else if(formSourceId){
+    formEntry = state.entries.find(x=>x.id===formSourceId) || null;
+  } else if(currentWeekEntry){
+    formEntry = currentWeekEntry;
+    formIsAutoFromDailyLog = true;
+  }
   const rates = state.rates;
   const targets = reverseTargets(state.meta.targetLoans, rates);
   const weekly = weeklyOf(targets);
@@ -2209,7 +2321,7 @@ RENDERERS["dashboard"] = function(){
     <div class="flex-between">
       <div>
         <div class="section-title">Preencher semana</div>
-        <div class="section-help">${formEntry ? `Editando: <b>${esc(formEntry.weekLabel||"sem rótulo")}</b> — os campos abaixo carregaram os valores dessa semana.` : "Formulário em branco para lançar uma semana nova. Para editar uma semana antiga, use a tabela de histórico abaixo."}</div>
+        <div class="section-help">${formIsAutoFromDailyLog ? `✅ Semana atual montada a partir do <b>lançamento diário</b> (${esc(formEntry.weekLabel||"")}) — confira os valores abaixo e clique em <b>Salvar semana</b> só pra confirmar. Loan Officers e Realtor Partners ainda precisam ser preenchidos manualmente.` : formEntry ? `Editando: <b>${esc(formEntry.weekLabel||"sem rótulo")}</b> — os campos abaixo carregaram os valores dessa semana.` : "Formulário em branco para lançar uma semana nova. Para editar uma semana antiga, use a tabela de histórico abaixo."}</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <div>
@@ -2220,7 +2332,7 @@ RENDERERS["dashboard"] = function(){
           <label class="field-label" style="margin-bottom:3px;">Rótulo (gerado automaticamente, editável)</label>
           <input type="text" id="week-label" placeholder="Rótulo (ex: Semana 12 - Mar)" value="${esc(formEntry?formEntry.weekLabel:'')}" style="width:220px;max-width:100%;flex:1 1 160px;">
         </div>
-        ${formEntry ? `<button class="btn secondary" id="btn-cancel-edit">Cancelar edição</button>` : ""}
+        ${(formEntry && !formIsAutoFromDailyLog) ? `<button class="btn secondary" id="btn-cancel-edit">Cancelar edição</button>` : ""}
         <button class="btn" id="btn-save-entry">${formEntry?'Salvar alterações':'Salvar semana'}</button>
       </div>
     </div>
@@ -2363,6 +2475,8 @@ function dailyLogCard(){
 function historySection(){
   const entries = state.entries;
   if(!entries.length) return "";
+  const currentWeekMonday = getMondayOf(dailyLogDate);
+  const formHasContent = formSourceId || entries.some(e=>e.weekStartDate===currentWeekMonday);
   const CHART_CAP = 104; // ~2 years of weekly data, so the SVG stays readable even with 5+ years imported
   const chartEntries = entries.length > CHART_CAP ? entries.slice(entries.length - CHART_CAP) : entries;
   const hist = historicalStats();
@@ -2416,7 +2530,7 @@ function historySection(){
         <div class="section-title">Histórico completo (${entries.length} semanas)</div>
         <div class="section-help">Clique em Editar para carregar uma semana antiga no formulário acima, ou Excluir para remover um registro. ${incompleteCount>0?`<span style="color:var(--red);font-weight:600;">${incompleteCount} semana(s) com dados incompletos</span> — passe o mouse no status para ver quais campos faltam.`:'Todas as semanas estão com os 13 campos preenchidos.'}</div>
       </div>
-      ${formSourceId ? "" : `<button class="btn secondary small" id="btn-new-week">+ Nova semana em branco</button>`}
+      ${formHasContent ? `<button class="btn secondary small" id="btn-new-week">+ Nova semana em branco</button>` : ""}
     </div>
     <div class="hr"></div>
     <div style="max-height:420px;overflow-y:auto;overflow-x:auto;">
@@ -2603,6 +2717,7 @@ RENDERERS["blueprint"] = function(){
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn secondary" id="btn-download-blueprint" ${!state.blueprint?'disabled':''}>Baixar (.md)</button>
+        <button class="btn secondary" id="btn-print-report">📄 Gerar PDF / Dashboard</button>
         <button class="btn" id="btn-gen-blueprint">Gerar Blueprint 30/60/90</button>
       </div>
     </div>
