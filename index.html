@@ -186,6 +186,14 @@ td input, td select{padding:6px 8px;font-size:13px;}
 .rank-badge.gold{background:#FCEFC7;color:#946200;}
 .rank-badge.silver{background:#E8EAED;color:#5A5F66;}
 .rank-badge.bronze{background:#F3DFC9;color:#8A5A2B;}
+.day-strip{display:flex;gap:8px;flex-wrap:wrap;}
+.day-chip{flex:1;min-width:60px;border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer;background:#fff;transition:border-color .12s ease;}
+.day-chip:hover{border-color:var(--navy-soft);}
+.day-chip.selected{border-color:var(--navy);box-shadow:0 0 0 2px #EAF0F8;}
+.day-chip.logged{background:var(--green-bg);border-color:#CDEBD9;}
+.day-chip-label{font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;font-weight:700;}
+.day-chip-mark{font-size:15px;font-weight:700;color:var(--ink-muted);margin-top:3px;}
+.day-chip.logged .day-chip-mark{color:var(--green);}
 
 .pill-nav{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
 .pill-nav .p{padding:6px 13px;border-radius:100px;font-size:12.5px;font-weight:600;background:#fff;border:1px solid var(--line);color:var(--ink-muted);cursor:pointer;}
@@ -712,7 +720,7 @@ function defaultState(companyName){
     meta: {companyName: companyName || "Nova Empresa", targetLoans:100, period:"Mensal"},
     rates: {...DEFAULT_RATES},
     entries: [], scorecard: [], actionPlan: [], coachHistory: [], meetings: [],
-    experiments: [], sops: [], kbNotes: [],
+    experiments: [], sops: [], kbNotes: [], dailyLogs: [],
     loanOfficersList: [], realtorPartnersList: [], channels: [], risks: [],
     blueprint: null, blueprintDate: null,
     aiAnalysis: null, aiAnalysisDate: null,
@@ -728,6 +736,7 @@ let sopFilter = "Todos";
 let importSummaryHtml = "";
 let backupSummaryHtml = "";
 let formSourceId = null; // when set, the "Preencher semana" form edits this historical entry instead of a blank new one
+let dailyLogDate = new Date().toISOString().slice(0,10);
 
 // Multiple companies ("workspaces") can share this same tool, each with fully isolated data.
 // "default" always maps to the original, unprefixed storage keys so existing data never gets orphaned.
@@ -745,6 +754,7 @@ const STORAGE_KEYS = {
   aiAnalysis:"go-ai-analysis", progress:"go-progress",
   loanOfficersList:"go-loan-officers", realtorPartnersList:"go-realtor-partners",
   channels:"go-channels", risks:"go-risks", blueprint:"go-blueprint",
+  dailyLogs:"go-daily-logs",
 };
 
 async function loadWorkspacesList(){
@@ -866,6 +876,61 @@ function formatWeekLabelFromDate(isoDateStr){
   const fmt = d => pad2(d.getDate()) + "/" + pad2(d.getMonth()+1);
   return `${fmt(start)} – ${fmt(end)}/${end.getFullYear()}`;
 }
+
+/* ============================= DAILY LOG (auto-builds the week) ============================= */
+
+const DAILY_LOG_FIELDS = [
+  {key:"leads", label:"Leads"}, {key:"qualifiedLeads", label:"Qualified Leads"},
+  {key:"appointments", label:"Appointments"}, {key:"applications", label:"Applications"},
+  {key:"preApprovals", label:"Pre Approvals"}, {key:"clearToClose", label:"Clear To Close"},
+  {key:"loans", label:"Loans"}, {key:"revenue", label:"Revenue", prefix:"$"},
+  {key:"marketingSpend", label:"Marketing Spend", prefix:"$"}, {key:"responseTime", label:"Response Time (min)"},
+];
+
+// Every week (whatever day it starts on) is bucketed to its Monday, so daily logs group consistently.
+function getMondayOf(dateStr){
+  const d = new Date(dateStr + "T00:00:00");
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1 - day);
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0,10);
+}
+
+function dailyLogsForWeek(mondayDate){
+  const start = new Date(mondayDate + "T00:00:00");
+  const end = new Date(start); end.setDate(end.getDate()+6);
+  return state.dailyLogs.filter(l=>{
+    const d = new Date(l.date + "T00:00:00");
+    return d >= start && d <= end;
+  }).sort((a,b)=> a.date < b.date ? -1 : 1);
+}
+
+// Sums the daily logs for a week into that week's entry in state.entries — this is what makes
+// "log today's numbers" automatically build the weekly total, without touching manual entries.
+function recomputeWeekFromDailyLogs(mondayDate){
+  const logs = dailyLogsForWeek(mondayDate);
+  const sumKeys = ["leads","qualifiedLeads","appointments","applications","preApprovals","clearToClose","loans","revenue","marketingSpend"];
+  const sums = {};
+  sumKeys.forEach(k=>{ sums[k] = logs.reduce((a,l)=> a + (l[k]||0), 0); });
+  const rtVals = logs.map(l=>l.responseTime).filter(v=>v!==null&&v!==undefined);
+  const avgResponseTime = rtVals.length ? Math.round(rtVals.reduce((a,b)=>a+b,0)/rtVals.length) : null;
+  const cac = sums.loans>0 ? Math.round(sums.marketingSpend/sums.loans) : null;
+  const weekLabel = formatWeekLabelFromDate(mondayDate);
+
+  const existingIdx = state.entries.findIndex(e=>e.weekStartDate===mondayDate);
+  const base = existingIdx!==-1 ? {...state.entries[existingIdx]} : {id:uid(), loanOfficers:null, realtorPartners:null};
+  Object.assign(base, sums);
+  base.responseTime = avgResponseTime;
+  base.cac = cac;
+  base.weekLabel = weekLabel;
+  base.weekStartDate = mondayDate;
+  base.fromDailyLog = true;
+
+  if(existingIdx !== -1) state.entries[existingIdx] = base;
+  else state.entries.push(base);
+  persist('entries');
+}
+
 function pct(n){ if(n===undefined||n===null||isNaN(n)) return "—"; return Math.round(n)+"%"; }
 function esc(s){ return (s||"").toString().replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
@@ -1469,6 +1534,44 @@ function bindEvents(){
       });
     });
 
+    /* ---- Daily Log ---- */
+    const dayDateInput = document.getElementById('daylog-date');
+    if(dayDateInput) dayDateInput.addEventListener('change', ()=>{
+      dailyLogDate = dayDateInput.value || dailyLogDate;
+      rerender();
+    });
+    main.querySelectorAll('[data-pick-day]').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        dailyLogDate = chip.dataset.pickDay;
+        rerender();
+      });
+    });
+    const saveDayBtn = document.getElementById('btn-save-daylog');
+    if(saveDayBtn) saveDayBtn.addEventListener('click', ()=>{
+      const date = document.getElementById('daylog-date').value;
+      if(!date){ alert("Escolha um dia."); return; }
+      const log = {date};
+      DAILY_LOG_FIELDS.forEach(f=>{
+        const el = document.getElementById('daylog-'+f.key);
+        log[f.key] = el.value === "" ? null : Number(el.value);
+      });
+      const existingIdx = state.dailyLogs.findIndex(l=>l.date===date);
+      if(existingIdx !== -1){ log.id = state.dailyLogs[existingIdx].id; state.dailyLogs[existingIdx] = log; }
+      else { log.id = uid(); state.dailyLogs.push(log); }
+      persist('dailyLogs');
+      recomputeWeekFromDailyLogs(getMondayOf(date));
+      rerender();
+    });
+    main.querySelectorAll('[data-del-daylog]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const log = state.dailyLogs.find(l=>l.id===b.dataset.delDaylog);
+        state.dailyLogs = state.dailyLogs.filter(l=>l.id!==b.dataset.delDaylog);
+        persist('dailyLogs');
+        if(log) recomputeWeekFromDailyLogs(getMondayOf(log.date));
+        rerender();
+      });
+    });
+
     const templateBtn = document.getElementById('btn-download-template');
     if(templateBtn) templateBtn.addEventListener('click', downloadCSVTemplate);
 
@@ -1485,7 +1588,15 @@ function bindEvents(){
             const parsed = parseCSV(reader.result);
             const {entries: newEntries, issues} = csvRowsToEntries(parsed);
             if(!newEntries.length){
-              importSummaryHtml = `<div class="empty" style="margin-top:14px;">Nenhuma linha reconhecida. Confira se os cabeçalhos da planilha batem com o modelo (baixe o modelo CSV para conferir).</div>`;
+              const detected = (parsed.rawHeaders||[]).length
+                ? parsed.rawHeaders.map(h=>esc(h)).join(", ")
+                : "nenhum cabeçalho detectado — confira se a primeira linha do arquivo tem os nomes das colunas";
+              importSummaryHtml = `<div class="empty" style="margin-top:14px;text-align:left;">
+                <b>Nenhuma linha reconhecida.</b><br><br>
+                Cabeçalhos detectados no seu arquivo: <span class="mono">${detected}</span><br><br>
+                Nenhum desses bateu com as colunas esperadas (Semana, Leads, Qualified Leads, Appointments, Applications, Pre Approvals, Clear To Close, Loans, Revenue, Marketing Spend, CAC, Response Time, Loan Officers, Realtor Partners).<br><br>
+                Causas mais comuns: o arquivo tem uma linha de título/logo antes do cabeçalho real, os nomes das colunas estão diferentes do esperado, ou o arquivo não é realmente um CSV (é um .xlsx renomeado, por exemplo — nesse caso, abra no Excel/Sheets e exporte como CSV de verdade).
+              </div>`;
               rerender();
               return;
             }
@@ -2092,6 +2203,8 @@ RENDERERS["dashboard"] = function(){
     <div id="backup-summary">${backupSummaryHtml}</div>
   </div>
 
+  ${dailyLogCard()}
+
   <div class="card">
     <div class="flex-between">
       <div>
@@ -2168,6 +2281,82 @@ function missingDataBanner(entry){
   if(c.isComplete) return "";
   return `<div class="data-alert warn">
     <div><b>⚠ Dados incompletos na semana "${esc(entry.weekLabel||"sem rótulo")}".</b> Faltam ${c.missing.length} de ${c.total} campos: ${c.missing.map(f=>esc(f.label)).join(", ")}. Esses campos aparecem como "—" no funil e podem distorcer os cálculos de conversão, correlação e a análise da IA.</div>
+  </div>`;
+}
+
+const WEEKDAY_LABELS = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+
+function dailyLogCard(){
+  const monday = getMondayOf(dailyLogDate);
+  const logs = dailyLogsForWeek(monday);
+  const logsByDate = {};
+  logs.forEach(l=> logsByDate[l.date] = l);
+
+  const weekDays = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(monday + "T00:00:00");
+    d.setDate(d.getDate()+i);
+    weekDays.push(d.toISOString().slice(0,10));
+  }
+
+  const strip = weekDays.map((d,i)=>{
+    const logged = !!logsByDate[d];
+    const isSelected = d === dailyLogDate;
+    return `<div class="day-chip ${logged?'logged':''} ${isSelected?'selected':''}" data-pick-day="${d}" title="${d}">
+      <div class="day-chip-label">${WEEKDAY_LABELS[i]}</div>
+      <div class="day-chip-mark">${logged?'✓':'—'}</div>
+    </div>`;
+  }).join("");
+
+  const sumKeys = ["leads","qualifiedLeads","appointments","applications","preApprovals","clearToClose","loans","revenue","marketingSpend"];
+  const sums = {};
+  sumKeys.forEach(k=>{ sums[k] = logs.reduce((a,l)=>a+(l[k]||0),0); });
+
+  const existingLog = logsByDate[dailyLogDate];
+
+  const logRows = logs.map(l=>`
+    <tr data-daylog-id="${l.id}">
+      <td class="mono small">${l.date}</td>
+      <td>${fmtNum(l.leads)}</td>
+      <td>${fmtNum(l.appointments)}</td>
+      <td>${fmtNum(l.loans)}</td>
+      <td>${fmtMoney(l.revenue)}</td>
+      <td><button class="btn ghost small" data-del-daylog="${l.id}">Remover</button></td>
+    </tr>`).join("");
+
+  return `
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <div class="section-title">Lançamento diário</div>
+        <div class="section-help">Registre os números de hoje — o sistema soma sozinho na semana correspondente (${formatWeekLabelFromDate(monday)}) e atualiza o Dashboard automaticamente. Não precisa esperar a semana fechar pra ver os dados.</div>
+      </div>
+    </div>
+    <div class="hr"></div>
+
+    <div class="day-strip">${strip}</div>
+
+    <div class="grid g3" style="margin-top:16px;">
+      <div class="field">
+        <label class="field-label">Dia</label>
+        <input type="date" id="daylog-date" value="${dailyLogDate}">
+      </div>
+    </div>
+    <div class="grid g4" style="margin-top:6px;">
+      ${DAILY_LOG_FIELDS.map(f=>`<div class="field"><label class="field-label">${trm(f.label)}</label><input type="number" min="0" id="daylog-${f.key}" value="${existingLog?(existingLog[f.key]??''):''}"></div>`).join("")}
+    </div>
+    <button class="btn" id="btn-save-daylog">Salvar dia</button>
+
+    <div class="hr"></div>
+    <div class="section-title" style="font-size:12px;">Progresso da semana (${logs.length}/7 dias lançados)</div>
+    <div class="grid g4" style="margin-top:10px;">
+      <div class="kpi-card"><div class="label">Leads (soma)</div><div class="value">${fmtNum(sums.leads)}</div></div>
+      <div class="kpi-card"><div class="label">Appointments (soma)</div><div class="value">${fmtNum(sums.appointments)}</div></div>
+      <div class="kpi-card"><div class="label">Loans (soma)</div><div class="value">${fmtNum(sums.loans)}</div></div>
+      <div class="kpi-card"><div class="label">Revenue (soma)</div><div class="value">${fmtMoney(sums.revenue)}</div></div>
+    </div>
+    ${logs.length ? `<div style="overflow-x:auto;margin-top:12px;"><table style="min-width:520px;"><thead><tr><th>Dia</th><th>Leads</th><th>Appointments</th><th>Loans</th><th>Revenue</th><th></th></tr></thead><tbody>${logRows}</tbody></table></div>` : ''}
+    <div class="small muted" style="margin-top:10px;">Loan Officers, Realtor Partners e CAC não são lançados por dia — CAC é recalculado automaticamente (gasto ÷ loans da semana), e os outros dois você ainda edita direto na semana (abaixo ou no histórico).</div>
   </div>`;
 }
 
